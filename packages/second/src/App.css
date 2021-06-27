@@ -1,0 +1,42 @@
+:root {
+    --bg-color: #050509;
+    --fg-color: #ff4151;
+    --light-color: #eee;
+
+    --weather-width: 50rem;
+    --weather-graph-height: 3rem;
+    --weather-graph-width: 20rem;
+
+    --icon-size: 6rem;
+}
+
+body {
+    margin: 0;
+    background-color: var(--bg-color);
+    color: var(--fg-color);
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+}
+
+h1 {
+    font-size: 10rem;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.hidden {
+    opacity: 0;
+}
+
+.fade {
+    transition: opacity 1s;
+}

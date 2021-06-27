@@ -1,0 +1,47 @@
+.report {
+    display: flex;
+    flex-direction: column;
+}
+
+.icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.report-icon {
+    width: var(--icon-size);
+    height: auto;
+    margin-bottom: 2rem;
+}
+
+.report-metric {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    grid-gap: 4rem;
+    height: var(--weather-graph-height);
+    margin-bottom: 1.5rem;
+}
+
+.metric-graph {
+    height: var(--weather-graph-height);
+    width: var(--weather-graph-width);
+}
+
+.metric-now {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: baseline;
+    margin-top: auto;
+}
+
+.metric-title {
+    color: var(--light-color);
+    margin-right: 0.5rem;
+}
+
+.metric-value {
+    font-size: 2rem;
+    justify-self: end;
+}
