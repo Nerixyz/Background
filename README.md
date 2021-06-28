@@ -6,7 +6,7 @@ It uses the [DWD open-data server](https://opendata.dwd.de/) to get weather data
 
 # Images
 
-### MainMonitor
+### Main Monitor
 
 ![Main Monitor](https://i.imgur.com/HdG5gf1.png)
 
