@@ -19,13 +19,7 @@ interface Props {
   getMetric: (obj: CommonWeatherObj) => number;
 }
 
-const WeatherGraph: React.FC<Props> = ({
-  data,
-  getMetric,
-  width,
-  padding = { top: 0.05, bottom: 0.05 },
-  height,
-}) => {
+const WeatherGraph: React.FC<Props> = ({ data, getMetric, width, padding = { top: 0.05, bottom: 0.05 }, height }) => {
   const dateScale = useMemo(
     () =>
       scaleTime({
