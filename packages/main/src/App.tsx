@@ -13,7 +13,6 @@ function App() {
       try {
         const data = await getDwdCommonWeather();
         const firstTs = findFirstValidTs(data);
-        console.log(data, firstTs);
         setWeatherData(dataArraysToObjectsUnsafe<CommonWeatherData>(data).slice(firstTs, firstTs + 24));
       } catch (e) {
         console.error(e);
