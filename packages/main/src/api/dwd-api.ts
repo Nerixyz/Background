@@ -66,7 +66,7 @@ function getIcons(forecast: ForecastResponseData): number[] {
       return withCloudTotal(cloudCover, 22, 17, 17);
     } else if (inRange(sig, 51, 54) || inRange(sig, 61, 63) || sig === 80) {
       return withCloudTotal(cloudCover, 18, 19, 20);
-    } else if (sig === 55 || inRange(sig, 64, 65 || inRange(sig, 81, 84))) {
+    } else if (sig === 55 || inRange(sig, 64, 65) || inRange(sig, 81, 84)) {
       return withCloudTotal(cloudCover, 5, 6, 7);
     } else if (inRange(sig, 56, 60) || inRange(sig, 66, 70) || inRange(sig, 85, 90)) {
       return withCloudTotal(cloudCover, 11, 12, 13);
