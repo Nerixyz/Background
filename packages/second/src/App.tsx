@@ -23,7 +23,7 @@ function App() {
 
     return () => clearTimeout(timeout);
   }, [setReport]);
-  return <main>{report ? <WeatherReport data={report} /> : null}</main>;
+  return <main>{report ? <WeatherReport data={report} updatedAt={updatedAt}/> : null}</main>;
 }
 
 export default App;

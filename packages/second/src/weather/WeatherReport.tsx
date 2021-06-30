@@ -7,6 +7,7 @@ const images = import.meta.globEager('/src/assets/weather/**/*.svg');
 
 interface Props {
   data: ReportDataEl[];
+  updatedAt: Date;
 }
 
 const WeatherReport: FunctionComponent<Props> = props => {
