@@ -6,11 +6,14 @@ import { getReport } from './api/dwd-api';
 
 function App() {
   const [report, setReport] = useState<null | ReportDataEl[]>(null);
+  const [updatedAt, setUpdatedAt] = useState(new Date());
   useEffect(() => {
     let timeout = 0;
     const updateReport = async () => {
       try {
-        setReport(await getReport());
+        const data = await getReport();
+        setUpdatedAt(new Date(data[data.length - 1].timestamp));
+        setReport(data);
       } catch (e) {
         console.error(e);
       }
