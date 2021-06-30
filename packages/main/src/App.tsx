@@ -8,12 +8,14 @@ import { CommonWeatherData, CommonWeatherObj } from './types';
 
 function App() {
   const [weatherData, setWeatherData] = useState<CommonWeatherObj[]>([]);
+  const [updatedAt, setUpdatedAt] = useState(new Date());
   useEffect(() => {
     const updateData = async () => {
       try {
-        const data = await getDwdCommonWeather();
+        const [data, updated] = await getDwdCommonWeather();
         const firstTs = findFirstValidTs(data);
         setWeatherData(dataArraysToObjectsUnsafe<CommonWeatherData>(data).slice(firstTs, firstTs + 24));
+        setUpdatedAt(updated);
       } catch (e) {
         console.error(e);
       }
@@ -22,12 +24,12 @@ function App() {
     const interval = setInterval(updateData, 10 * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [setWeatherData]);
+  }, [setWeatherData, setUpdatedAt]);
   return (
     <main>
       <Clock />
       <div className={[weatherData ? '' : 'hidden', 'fade'].join(' ')}>
-        {weatherData ? <Weather data={weatherData} /> : undefined}
+        {weatherData ? <Weather data={weatherData} updatedAt={updatedAt} /> : undefined}
       </div>
     </main>
   );
