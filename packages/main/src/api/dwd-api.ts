@@ -1,26 +1,24 @@
 import { ForecastResponse, ForecastResponseData } from './dwd-api.types';
-import { CommonWeatherData } from '../types';
+import { CommonWeatherResponse } from '../types';
 
-export async function getDwdCommonWeather(): Promise<CommonWeatherData> {
+export async function getDwdCommonWeather(): Promise<CommonWeatherResponse> {
   const base = await getForecast();
   return dwdToCommon(base);
 }
 
-async function getForecast(): Promise<ForecastResponseData> {
-  const res: ForecastResponse = await fetch(
-    `https://weatherapi.nerixyz.de/forecast/${import.meta.env.VITE_APP_STATION}`,
+async function getForecast(): Promise<ForecastResponse> {
+  return await fetch(
+    `https://weatherapi.nerixyz.de/forecast/${ import.meta.env.VITE_APP_STATION }`,
   ).then(x => x.json());
-
-  return res.data;
 }
 
-function dwdToCommon(dwd: ForecastResponseData): CommonWeatherData {
-  return {
+function dwdToCommon({data: dwd, issue_time}: ForecastResponse): CommonWeatherResponse {
+  return [{
     temp: (dwd.temp ?? []).map(x => (x === null ? 0 : x)),
     rain: (dwd.precipitation_1h_significant_weather ?? []).map(x => (x === null ? 0 : x)),
     timestamp: dwd.time_steps,
     icon: getIcons(dwd),
-  };
+  }, new Date(issue_time)];
 }
 
 /**

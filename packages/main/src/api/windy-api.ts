@@ -1,16 +1,16 @@
-import { CommonWeatherData } from '../types';
+import { CommonWeatherResponse } from '../types';
 
 export let Windy = { version: '0', token: '', uid: '', token2: '' };
 
-import { WindyData, WindyResponse } from './windy-api.types';
+import { WindyResponse } from './windy-api.types';
 
-export async function getWindyCommonWeather(): Promise<CommonWeatherData> {
+export async function getWindyCommonWeather(): Promise<CommonWeatherResponse> {
   if (!Windy.token) {
     await initWindy();
   }
 
   const data = await getWindyWeather();
-  return windyToCommon(data.data);
+  return windyToCommon(data);
 }
 
 function proxyFetch(url: string) {
@@ -51,13 +51,13 @@ async function initWindy() {
   };
 }
 
-export function windyToCommon(data: WindyData): CommonWeatherData {
-  return {
-    temp: data.temp,
-    rain: data.rain,
-    timestamp: data.ts,
-    icon: data.icon,
-  };
+export function windyToCommon(res: WindyResponse): CommonWeatherResponse {
+  return [{
+    temp: res.data.temp,
+    rain: res.data.rain,
+    timestamp: res.data.ts,
+    icon: res.data.icon,
+  }, new Date(res.header.updateTs)];
 }
 
 async function getWindyWeather(): Promise<WindyResponse> {
