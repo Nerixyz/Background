@@ -52,12 +52,15 @@ async function initWindy() {
 }
 
 export function windyToCommon(res: WindyResponse): CommonWeatherResponse {
-  return [{
-    temp: res.data.temp,
-    rain: res.data.rain,
-    timestamp: res.data.ts,
-    icon: res.data.icon,
-  }, new Date(res.header.updateTs)];
+  return [
+    {
+      temp: res.data.temp,
+      rain: res.data.rain,
+      timestamp: res.data.ts,
+      icon: res.data.icon,
+    },
+    new Date(res.header.updateTs),
+  ];
 }
 
 async function getWindyWeather(): Promise<WindyResponse> {
