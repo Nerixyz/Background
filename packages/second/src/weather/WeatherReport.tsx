@@ -38,6 +38,9 @@ const WeatherReport: FunctionComponent<Props> = props => {
         <WeatherMetric title={'Cloud Cover'} data={props.data} getMetric={d => d.cloud_cover_total ?? 0} unit="%" />
         <WeatherMetric title={'Humidity'} data={props.data} getMetric={d => d.relative_humidity ?? 0} unit="%" />
       </div>
+      <div className="report-updated-at">
+        Last Updated: {new Intl.DateTimeFormat(undefined, { timeStyle: 'short' }).format(props.updatedAt)}
+      </div>
     </div>
   );
 };

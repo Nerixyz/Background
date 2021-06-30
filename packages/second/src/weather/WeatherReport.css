@@ -45,3 +45,10 @@
     font-size: 2rem;
     justify-self: end;
 }
+
+.report-updated-at {
+    align-self: center;
+    margin-top: 3rem;
+    font-size: 0.9rem;
+    opacity: 70%;
+}
