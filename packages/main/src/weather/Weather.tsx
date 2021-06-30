@@ -54,6 +54,9 @@ const Weather: FunctionComponent<Props> = props => {
           </ParentSize>
         </div>
       ) : null}
+      <div className="weather-updated-at">
+        Last Updated: {new Intl.DateTimeFormat(undefined, {timeStyle: 'short'}).format(props.updatedAt)}
+      </div>
     </div>
   );
 };

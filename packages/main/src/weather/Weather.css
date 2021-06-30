@@ -42,3 +42,9 @@
     font-size: var(--weather-card-font-size);
     font-weight: 700;
 }
+
+.weather-updated-at {
+    align-self: center;
+    margin-top: 2rem;
+    font-size: 0.9rem;
+}
