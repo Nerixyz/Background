@@ -8,4 +8,6 @@ export type CommonWeatherData = {
   icon: number[];
 };
 
+export type CommonWeatherResponse = [CommonWeatherData, Date];
+
 export type CommonWeatherObj = ArrToObj<CommonWeatherData>;
