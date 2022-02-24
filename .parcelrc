@@ -1,0 +1,10 @@
+{
+  "extends": "@parcel/config-default",
+  "transformers": {
+    "*.css": ["@parcel/transformer-css-experimental"]
+  },
+  "optimizers": {
+    "*.css": ["@parcel/optimizer-css"]
+  },
+  "resolvers": ["@parcel/resolver-glob",  "..."]
+}

@@ -1,8 +1,9 @@
 import { ReportDataEl, StationReport } from './dwd-api.types';
 
 export async function getReport(): Promise<ReportDataEl[]> {
+  console.log(process.env.STATION_ID);
   const res: StationReport = await fetch(
-    `https://weatherapi.nerixyz.de/report/${import.meta.env.VITE_APP_STATION}`,
+    `https://weatherapi.nerixyz.de/report/${ process.env.STATION_ID }`,
   ).then(x => x.json());
 
   return res.data.sort((a, b) => a.timestamp - b.timestamp);

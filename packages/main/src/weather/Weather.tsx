@@ -5,7 +5,8 @@ import { ParentSize } from '@visx/responsive';
 import './Weather.css';
 import { stringifyNum, stringifyTemp } from '../utilities';
 import { everySecond, map } from '../itertools';
-const images = import.meta.globEager('/src/assets/weather/**/*.svg');
+// @ts-ignore
+import * as images from '../assets/weather/icons/**/*.svg';
 
 interface Props {
   data: CommonWeatherObj[];
@@ -27,11 +28,11 @@ const Weather: FunctionComponent<Props> = props => {
         {[
           ...map(everySecond(props.data), d => {
             const hour = new Date(d.timestamp).getHours();
-            const path = `/src/assets/weather/icons/${hour < 7 || hour > 20 ? 'night' : 'day'}/${d.icon}.svg`;
+            const image = images[hour < 7 || hour > 20 ? 'night' : 'day']?.[d.icon];
             return (
               <div key={d.timestamp} className="info-card">
                 <div className="info-hour">{hour}</div>
-                <img alt="icon" className="info-icon" src={images[path]?.default ?? ''} />
+                <img alt="icon" className="info-icon" src={image ?? ''} />
                 <div className="info-temp">{stringifyTemp(d.temp)}°C</div>
                 {anyRain ? <div className="info-rain">{stringifyNum(d.rain)}mm</div> : null}
               </div>
@@ -55,7 +56,7 @@ const Weather: FunctionComponent<Props> = props => {
         </div>
       ) : null}
       <div className="weather-updated-at">
-        Last Updated: {new Intl.DateTimeFormat(undefined, { timeStyle: 'short' }).format(props.updatedAt)}
+        Last Updated: {new Intl.DateTimeFormat(undefined, { timeStyle: 'short', hour12: false }).format(props.updatedAt)}
       </div>
     </div>
   );

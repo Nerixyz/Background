@@ -7,7 +7,7 @@ export async function getDwdCommonWeather(): Promise<CommonWeatherResponse> {
 }
 
 async function getForecast(): Promise<ForecastResponse> {
-  return await fetch(`https://weatherapi.nerixyz.de/forecast/${import.meta.env.VITE_APP_STATION}`).then(x => x.json());
+  return await fetch(`https://weatherapi.nerixyz.de/forecast/${process.env.STATION_ID}`).then(x => x.json());
 }
 
 function dwdToCommon({ data: dwd, issue_time }: ForecastResponse): CommonWeatherResponse {

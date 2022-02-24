@@ -3,7 +3,8 @@ import { ReportDataEl } from '../api/dwd-api.types';
 import './WeatherReport.css';
 import WeatherMetric from './WeatherMetric';
 import { getIcon } from '../api/dwd-api';
-const images = import.meta.globEager('/src/assets/weather/**/*.svg');
+// @ts-ignore
+import * as images from '../../../main/src/assets/weather/icons/**/*.svg';
 
 interface Props {
   data: ReportDataEl[];
@@ -14,7 +15,7 @@ const WeatherReport: FunctionComponent<Props> = props => {
   return (
     <div className="report">
       <div className="icon-wrapper">
-        <img alt="icon" className="report-icon" src={images[pathFromData(props.data)]?.default ?? ''} />
+        <img alt="icon" className="report-icon" src={pathFromData(images,props.data) ?? ''} />
       </div>
       <div>
         <WeatherMetric
@@ -39,7 +40,7 @@ const WeatherReport: FunctionComponent<Props> = props => {
         <WeatherMetric title={'Humidity'} data={props.data} getMetric={d => d.relative_humidity ?? 0} unit="%" />
       </div>
       <div className="report-updated-at">
-        Last Updated: {new Intl.DateTimeFormat(undefined, { timeStyle: 'short' }).format(props.updatedAt)}
+        Last Updated: {new Intl.DateTimeFormat(undefined, { timeStyle: 'short', hour12: false }).format(props.updatedAt)}
       </div>
     </div>
   );
@@ -47,8 +48,8 @@ const WeatherReport: FunctionComponent<Props> = props => {
 
 export default WeatherReport;
 
-function pathFromData(data: ReportDataEl[]): string {
+function pathFromData(images: Record<'day' | 'night', Record<number, string>>, data: ReportDataEl[]): string | undefined {
   const el = data[data.length - 1];
   const hour = new Date(el.timestamp).getHours();
-  return `/src/assets/weather/icons/${hour < 7 || hour > 20 ? 'night' : 'day'}/${getIcon(el)}.svg`;
+  return images[hour < 7 || hour > 20 ? 'night' : 'day']?.[getIcon(el)];
 }

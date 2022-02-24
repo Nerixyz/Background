@@ -30,5 +30,6 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'react/prop-types': 'off',
     'no-constant-condition': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off'
   },
 };

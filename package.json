@@ -2,27 +2,44 @@
   "name": "better-bg",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "build-all": "npm run build --workspaces",
-    "build-unsafe": "npm run build-unsafe --workspaces",
-    "format": "npm run format --workspaces",
-    "lint": "eslint --fix **/src/**/*.{js,ts,tsx,jsx}"
+    "build": "npm run build --workspaces",
+    "dev": "npm run dev --workspaces",
+    "format": "prettier -w packages/*/src/**/*.{ts,tsx,js,jsx} --loglevel warn",
+    "lint": "eslint --fix packages/*/src/**/*.{js,ts,tsx,jsx}"
   },
+  "workspaces": ["packages/main", "packages/second"],
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "workspaces": [
-    "packages\\main",
-    "packages\\second"
-  ],
+  "dependencies": {
+    "@visx/curve": "^2.1.0",
+    "@visx/gradient": "^2.1.0",
+    "@visx/grid": "^2.6.0",
+    "@visx/responsive": "^2.8.0",
+    "@visx/scale": "^2.2.2",
+    "@visx/shape": "^2.4.0",
+    "d3-array": "^3.1.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.26.1",
-    "@typescript-eslint/parser": "^4.26.1",
-    "eslint-plugin-react-hooks": "^4.2.0",
-    "eslint": "^7.28.0",
-    "eslint-plugin-react": "^7.24.0",
-    "prettier": "^2.3.1",
-    "typescript": "^4.3.4"
+    "@types/d3-array": "^3.0.2",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.11",
+
+    "@typescript-eslint/eslint-plugin": "^5.12.1",
+    "@typescript-eslint/parser": "^5.12.1",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "eslint": "^8.9.0",
+    "eslint-plugin-react": "^7.28.0",
+    "prettier": "^2.5.1",
+    "typescript": "^4.5.5",
+
+    "@parcel/optimizer-css": "^2.3.2",
+    "@parcel/transformer-css-experimental": "^2.3.2",
+    "@parcel/css": "^1.4.0",
+    "@parcel/resolver-glob": "^2.3.2",
+    "parcel": "^2.3.2"
   }
 }

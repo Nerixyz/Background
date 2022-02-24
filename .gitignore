@@ -6,5 +6,6 @@ dist-ssr
 .env
 .idea
 .vscode
+.parcel-cache
 
 packages/*/src/assets/weather/icons/

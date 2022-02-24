@@ -2,7 +2,7 @@ import { ParentSizeModern } from '@visx/responsive';
 import React, { FunctionComponent } from 'react';
 import { ReportDataEl } from '../api/dwd-api.types';
 import WeatherReportGraph from './WeatherReportGraph';
-import { lastNotUndefined, toPrettyString } from '../../utilities';
+import { lastNotUndefined, toPrettyString } from '../utilities';
 
 interface Props {
   title: string;
