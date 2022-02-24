@@ -4,7 +4,7 @@ import './WeatherReport.css';
 import WeatherMetric from './WeatherMetric';
 import { getIcon } from '../api/dwd-api';
 // @ts-ignore
-import * as images from '../../../main/src/assets/weather/icons/**/*.svg';
+import * as images from '../../../shared/assets/weather/icons/**/*.svg';
 
 interface Props {
   data: ReportDataEl[];
@@ -29,15 +29,17 @@ const WeatherReport: FunctionComponent<Props> = props => {
           data={props.data}
           getMetric={d => d.precipitation_amount_last_hour ?? 0}
           unit="mm"
+          view={{dataMin: 0}}
         />
         <WeatherMetric
           title={'Wind Speed'}
           data={props.data}
           getMetric={d => d['mean_wind_speed_during last_10_min_at_10_meters_above_ground'] ?? 0}
           unit="km/h"
+          view={{dataMin: 0}}
         />
-        <WeatherMetric title={'Cloud Cover'} data={props.data} getMetric={d => d.cloud_cover_total ?? 0} unit="%" />
-        <WeatherMetric title={'Humidity'} data={props.data} getMetric={d => d.relative_humidity ?? 0} unit="%" />
+        <WeatherMetric title={'Cloud Cover'} data={props.data} getMetric={d => d.cloud_cover_total ?? 0} unit="%" view={{dataMin: 0, dataMax: 100}} />
+        <WeatherMetric title={'Humidity'} data={props.data} getMetric={d => d.relative_humidity ?? 0} unit="%" view={{dataMin: 0, dataMax: 100}}/>
       </div>
       <div className="report-updated-at">
         Last Updated: {new Intl.DateTimeFormat(undefined, { timeStyle: 'short', hour12: false }).format(props.updatedAt)}

@@ -3,12 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "npm run build --workspaces",
-    "dev": "npm run dev --workspaces",
     "format": "prettier -w packages/*/src/**/*.{ts,tsx,js,jsx} --loglevel warn",
     "lint": "eslint --fix packages/*/src/**/*.{js,ts,tsx,jsx}"
   },
-  "workspaces": ["packages/main", "packages/second"],
+  "workspaces": ["packages\\main", "packages\\second", "packages\\shared"],
   "keywords": [],
   "author": "",
   "license": "MIT",

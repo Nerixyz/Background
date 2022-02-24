@@ -1,19 +1,26 @@
 import React, { useMemo } from 'react';
 import { extent, max, min } from 'd3-array';
 import { ReportDataEl } from '../api/dwd-api.types';
-import { scaleLinear, scaleTime } from '@visx/scale';
+import { scaleLinear } from '@visx/scale';
 import { LinearGradient } from '@visx/gradient';
-import { GridRows } from '@visx/grid';
+import { GridColumns, GridRows } from '@visx/grid';
 import { LinePath } from '@visx/shape';
-import { curveMonotoneX } from '@visx/curve';
+import { curveBasis } from '@visx/curve';
 import { THEME_COLOR } from '../constants';
+import { everySecond, map } from 'shared/itertools';
 
 const getDate = (d: ReportDataEl) => new Date(d.timestamp);
+
+export interface DataView {
+  dataMin?: number;
+  dataMax?: number;
+}
 
 interface Props {
   width: number;
   height: number;
   padding?: { top: number; bottom: number };
+  view?: DataView;
 
   data: ReportDataEl[];
   getMetric: (obj: ReportDataEl) => number;
@@ -24,12 +31,13 @@ const WeatherReportGraph: React.FC<Props> = ({
   getMetric,
   width,
   padding = { top: 0.05, bottom: 0.05 },
+  view = {},
   height,
 }) => {
   const dateScale = useMemo(
     () =>
-      scaleTime({
-        range: [0, width],
+      scaleLinear({
+        range: [width * 0.01, width * 0.98],
         domain: extent(data, getDate) as [Date, Date],
       }),
     [width, data],
@@ -39,12 +47,12 @@ const WeatherReportGraph: React.FC<Props> = ({
       scaleLinear({
         range: [height, 0],
         domain: [
-          (min(data, getMetric) || 0) - height * padding.bottom,
-          (max(data, getMetric) || 0) + height * padding.top,
+          (view.dataMin ?? (min(data, getMetric) || 0)) - height * padding.bottom,
+          (view.dataMax ?? (max(data, getMetric) || 0)) + height * padding.top,
         ],
         nice: true,
       }),
-    [height, data, getMetric, padding.bottom, padding.top],
+    [height, view.dataMin, view.dataMax, data, getMetric, padding.bottom, padding.top],
   );
 
   return (
@@ -54,10 +62,19 @@ const WeatherReportGraph: React.FC<Props> = ({
         <GridRows
           scale={valueScale}
           width={width}
-          strokeDasharray="1,3"
           stroke={THEME_COLOR}
-          strokeOpacity={0}
+          strokeDasharray="1,5"
+          strokeOpacity={0.75}
           pointerEvents="none"
+          numTicks={4}
+        />
+        <GridColumns
+          scale={dateScale}
+          height={height}
+          stroke={THEME_COLOR}
+          strokeOpacity={0.2}
+          pointerEvents="none"
+          tickValues={[...everySecond(map(data, getDate))]}
         />
         <LinePath<ReportDataEl>
           data={data}
@@ -66,7 +83,7 @@ const WeatherReportGraph: React.FC<Props> = ({
           shapeRendering="geometricPrecision"
           strokeWidth={3}
           stroke="url(#area-gradient)"
-          curve={curveMonotoneX}
+          curve={curveBasis}
         />
       </svg>
     </div>

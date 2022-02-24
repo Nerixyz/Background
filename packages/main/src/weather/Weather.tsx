@@ -4,9 +4,9 @@ import { CommonWeatherObj } from '../types';
 import { ParentSize } from '@visx/responsive';
 import './Weather.css';
 import { stringifyNum, stringifyTemp } from '../utilities';
-import { everySecond, map } from '../itertools';
+import { everySecond, map } from 'shared/itertools';
 // @ts-ignore
-import * as images from '../assets/weather/icons/**/*.svg';
+import * as images from '../../../shared/assets/weather/icons/**/*.svg';
 
 interface Props {
   data: CommonWeatherObj[];

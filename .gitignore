@@ -8,4 +8,4 @@ dist-ssr
 .vscode
 .parcel-cache
 
-packages/*/src/assets/weather/icons/
+packages/shared/assets/weather/icons/

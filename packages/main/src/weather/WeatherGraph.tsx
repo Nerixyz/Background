@@ -4,7 +4,7 @@ import { CommonWeatherObj } from '../types';
 import { LinearGradient } from '@visx/gradient';
 import { GridRows } from '@visx/grid';
 import { AreaClosed } from '@visx/shape';
-import { curveNatural } from '@visx/curve';
+import { curveBasis } from '@visx/curve';
 import { extent, max, min } from 'd3-array';
 import { THEME_COLOR } from '../constants';
 // accessors
@@ -61,7 +61,7 @@ const WeatherGraph: React.FC<Props> = ({ data, getMetric, width, padding = { top
           strokeWidth={1}
           stroke="url(#area-gradient)"
           fill="url(#area-gradient)"
-          curve={curveNatural}
+          curve={curveBasis}
         />
       </svg>
     </div>

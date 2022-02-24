@@ -1,4 +1,5 @@
 {
+  "private": true,
   "name": "second",
   "version": "1.0.0",
   "scripts": {
@@ -6,5 +7,6 @@
     "build": "parcel build src/index.html"
   },
   "dependencies": {
+    "shared": "^1.0.0"
   }
 }

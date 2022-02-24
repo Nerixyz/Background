@@ -1,7 +1,7 @@
 import { ParentSizeModern } from '@visx/responsive';
 import React, { FunctionComponent } from 'react';
 import { ReportDataEl } from '../api/dwd-api.types';
-import WeatherReportGraph from './WeatherReportGraph';
+import WeatherReportGraph, { DataView } from './WeatherReportGraph';
 import { lastNotUndefined, toPrettyString } from '../utilities';
 
 interface Props {
@@ -11,6 +11,7 @@ interface Props {
   data: ReportDataEl[];
   getMetric: (obj: ReportDataEl) => number;
   getMetricMaybe?: (obj: ReportDataEl) => number | null;
+  view?: DataView,
 }
 
 const WeatherMetric: FunctionComponent<Props> = props => {
@@ -32,6 +33,7 @@ const WeatherMetric: FunctionComponent<Props> = props => {
               data={props.data}
               getMetric={props.getMetric}
               padding={{ top: 0.01, bottom: 0.01 }}
+              view={props.view}
             />
           )}
         </ParentSizeModern>
