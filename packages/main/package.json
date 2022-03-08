@@ -8,5 +8,17 @@
   },
   "dependencies": {
     "shared": "^1.0.0"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nerixyz/Background.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nerixyz/Background/issues"
+  },
+  "homepage": "https://github.com/Nerixyz/Background#readme",
+  "description": ""
 }

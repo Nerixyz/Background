@@ -5,5 +5,7 @@
   "scripts": {
     "build": "exit 0",
     "dev": "exit 0"
+  },
+  "dependencies": {
   }
 }

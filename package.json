@@ -6,7 +6,7 @@
     "format": "prettier -w packages/*/src/**/*.{ts,tsx,js,jsx} --loglevel warn",
     "lint": "eslint --fix packages/*/src/**/*.{js,ts,tsx,jsx}"
   },
-  "workspaces": ["packages\\main", "packages\\second", "packages\\shared"],
+  "workspaces": ["packages/*"],
   "keywords": [],
   "author": "",
   "license": "MIT",
