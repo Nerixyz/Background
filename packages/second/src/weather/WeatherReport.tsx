@@ -21,7 +21,7 @@ const WeatherReport: FunctionComponent<Props> = props => {
         <WeatherMetric
           title={'Temperature'}
           data={props.data}
-          getMetric={d => d.temperature_at_5_cm_above_ground ?? 0}
+          getMetric={d => d.dry_bulb_temperature_at_2_meter_above_ground ?? 0}
           unit="°C"
         />
         <WeatherMetric
