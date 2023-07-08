@@ -18,12 +18,12 @@ It uses the [DWD open-data server](https://opendata.dwd.de/) to get weather data
 
 - To get the icons (I'm using the icons from [Windy.com](https://windy.com)),
   run `Get-Icons.ps1` in [PowerShell](https://github.com/PowerShell/powershell/releases) (you might need PowerShell 7).
-- Rename `.env.example` to `.env` and edit the station-id.
+- Rename `.env.example` to `.env` and edit the station-id and optionally the icon set (`windy` or `msn`).
 
   Stations can be found on [`weatherapi.nerixyz.de/stations`](https://weatherapi.nerixyz.de/stations) or [dwd.de](https://www.dwd.de/DE/leistungen/met_verfahren_mosmix/mosmix_stationskatalog.cfg?view=nasPublication&nn=16102).
 
-- Run `npm i` to install the dependencies (you need npm v7).
-- Run `npm run build-unsafe` to build both backgrounds (unsafe because it's not type-checked).
+- Run `pnpm i` to install the dependencies (you need pnpm).
+- Run `pnpm build` to build both backgrounds.
 
 ### Setting up a local webserver
 
