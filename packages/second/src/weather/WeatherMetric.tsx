@@ -1,4 +1,4 @@
-import { ParentSizeModern } from '@visx/responsive';
+import { ParentSize } from '@visx/responsive';
 import React, { FunctionComponent } from 'react';
 import { ReportDataEl } from '../api/dwd-api.types';
 import WeatherReportGraph, { DataView } from './WeatherReportGraph';
@@ -11,7 +11,7 @@ interface Props {
   data: ReportDataEl[];
   getMetric: (obj: ReportDataEl) => number;
   getMetricMaybe?: (obj: ReportDataEl) => number | null;
-  view?: DataView,
+  view?: DataView;
 }
 
 const WeatherMetric: FunctionComponent<Props> = props => {
@@ -25,7 +25,7 @@ const WeatherMetric: FunctionComponent<Props> = props => {
         </div>
       </div>
       <div className="metric-graph">
-        <ParentSizeModern>
+        <ParentSize>
           {({ width, height }) => (
             <WeatherReportGraph
               width={width}
@@ -36,7 +36,7 @@ const WeatherMetric: FunctionComponent<Props> = props => {
               view={props.view}
             />
           )}
-        </ParentSizeModern>
+        </ParentSize>
       </div>
     </div>
   );

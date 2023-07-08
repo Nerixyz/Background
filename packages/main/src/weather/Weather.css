@@ -1,50 +1,51 @@
 #weather {
-    width: var(--weather-width);
-    transition: opacity 1s;
-    display: flex;
-    flex-direction: column;
+  width: var(--weather-width);
+  transition: opacity 1s;
+  display: flex;
+  flex-direction: column;
 }
 
 .weather-graph {
-    height: var(--weather-graph-height);
-    width: calc(var(--weather-width) - 2rem);
-    fill: var(--fg-color);
-    margin-left: 1rem;
-    margin-right: 1rem;
+  height: var(--weather-graph-height);
+  width: calc(var(--weather-width) - 2rem);
+  fill: var(--fg-color);
+  margin-left: 1rem;
+  margin-right: 1rem;
 }
 
 .info-cards {
-    display: grid;
-    grid-template-columns: repeat(var(--weather-data-points), minmax(0, 1fr));
-    grid-template-rows: 1fr;
-    margin: 1rem 0 1rem 0;
+  display: grid;
+  grid-template-columns: repeat(var(--weather-data-points), minmax(0, 1fr));
+  grid-template-rows: 1fr;
+  margin: 1rem 0 1rem 0;
 }
 
 .info-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .info-icon {
-    width: var(--weather-icon-size);
-    height: auto;
+  width: var(--weather-icon-size);
+  height: auto;
 }
 
-.info-temp, .info-rain {
-    font-size: var(--weather-detail-font-size);
-    font-weight: 500;
+.info-temp,
+.info-rain {
+  font-size: var(--weather-detail-font-size);
+  font-weight: 500;
 }
 
 .info-hour {
-    font-size: var(--weather-card-font-size);
-    font-weight: 700;
+  font-size: var(--weather-card-font-size);
+  font-weight: 700;
 }
 
 .weather-updated-at {
-    align-self: center;
-    margin-top: 2rem;
-    font-size: 0.9rem;
+  align-self: center;
+  margin-top: 2rem;
+  font-size: 0.9rem;
 }

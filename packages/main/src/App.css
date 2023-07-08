@@ -1,45 +1,45 @@
 :root {
-    --bg-color: #050509;
-    --fg-color: #ff4151;
-    --light-color: #eee;
+  --bg-color: #050509;
+  --fg-color: #ff4151;
+  --light-color: #eee;
 
-    --weather-width: 50rem;
-    --weather-graph-height: 4rem;
+  --weather-width: 50rem;
+  --weather-graph-height: 4rem;
 
-    --weather-data-points: 12;
+  --weather-data-points: 12;
 
-    --weather-icon-size: 1.5rem;
-    --weather-detail-font-size: 0.9rem;
-    --weather-card-font-size: 1.1rem;
+  --weather-icon-size: 1.5rem;
+  --weather-detail-font-size: 0.9rem;
+  --weather-card-font-size: 1.1rem;
 }
 
 body {
-    margin: 0;
-    background-color: var(--bg-color);
-    color: var(--fg-color);
-    font-family: 'JetBrains Mono', monospace;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    width: 100vw;
+  margin: 0;
+  background-color: var(--bg-color);
+  color: var(--fg-color);
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
 }
 
 h1 {
-    font-size: 10rem;
+  font-size: 10rem;
 }
 
 main {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .hidden {
-    opacity: 0;
+  opacity: 0;
 }
 
 .fade {
-    transition: opacity 1s;
+  transition: opacity 1s;
 }

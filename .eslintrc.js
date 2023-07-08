@@ -20,7 +20,7 @@ module.exports = {
   settings: {
     react: {
       version: 'detect',
-    }
+    },
   },
   plugins: ['react', '@typescript-eslint'],
   rules: {
@@ -30,6 +30,6 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'react/prop-types': 'off',
     'no-constant-condition': 'off',
-    '@typescript-eslint/ban-ts-comment': 'off'
+    '@typescript-eslint/ban-ts-comment': 'off',
   },
 };

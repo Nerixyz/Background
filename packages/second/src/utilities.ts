@@ -1,7 +1,7 @@
 export function lastNotUndefined<T>(data: Array<T>, selector: (el: T) => number | null) {
   for (let i = data.length - 1; i >= 0; i--) {
     const v = selector(data[i]);
-    if(typeof v === 'number') return v;
+    if (typeof v === 'number') return v;
   }
   return 0;
 }
