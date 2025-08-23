@@ -6,12 +6,12 @@ It uses the [DWD open-data server](https://opendata.dwd.de/) to get weather data
 
 # Images
 
-TBD
+TBD (there's a lot to do)
 
 # Setup
 
 - To get the icons (I'm using the icons from [msn.com](https://msn.com)),
-  run `Get-Icons.ps1` in [PowerShell](https://github.com/PowerShell/powershell/releases) (you might need PowerShell 7).
+  run `scripts/Get-Icons.ps1` in [PowerShell](https://github.com/PowerShell/powershell/releases) (you might need PowerShell 7).
 - Create a `bg.png` which contains your desired background - cropped to the monitor resolution.
 - Create a `config.toml`:
 
