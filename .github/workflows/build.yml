@@ -24,6 +24,7 @@ jobs:
         uses: dtolnay/rust-toolchain@master
         with:
           toolchain: beta
+          components: clippy
 
       - name: Build
         run: cargo build
