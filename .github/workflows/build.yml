@@ -1,0 +1,35 @@
+name: Rust
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  build:
+    name: Build and Lint
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Get Icons
+        shell: pwsh
+        run: ./scripts/Get-Icons.ps1
+
+      - name: Install rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: beta
+
+      - name: Build
+        run: cargo build
+
+      - name: Run clippy
+        run: cargo clippy --tests
+
+      - name: Run tests
+        run: cargo test
