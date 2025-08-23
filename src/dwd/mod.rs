@@ -205,15 +205,18 @@ impl Cache {
             .inspect_err(|e| eprintln!("Failed to fetch forecast: {e}"))
             .unwrap_or(false);
         let report = report_t
-            .join().map_err(|_| anyhow!("Failed to join"))?
+            .join()
+            .map_err(|_| anyhow!("Failed to join"))?
             .inspect_err(|e| eprintln!("Failed to fetch report: {e}"))
             .unwrap_or(false);
         let radar = radar_t
-            .join().map_err(|_| anyhow!("Failed to join"))?
+            .join()
+            .map_err(|_| anyhow!("Failed to join"))?
             .inspect_err(|e| eprintln!("Failed to fetch radar: {e}"))
             .unwrap_or(false);
         let synop = synop_t
-            .join().map_err(|_| anyhow!("Failed to join"))?
+            .join()
+            .map_err(|_| anyhow!("Failed to join"))?
             .inspect_err(|e| eprintln!("Failed to fetch synop: {e}"))
             .unwrap_or(false);
         Ok(forecast || report || radar || synop)

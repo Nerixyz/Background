@@ -117,10 +117,11 @@ pub fn plan_in<'a>(rect: skia_safe::Rect, all_points: &'a [Datapoint]) -> (Plan<
         }
         if let Some(ref mut s) = pending_sec
             && ts.hour() >= 14
-            && !p.data.condition.is_none() {
-                s.data = p.data.clone();
-                sections.push(pending_sec.take().unwrap());
-            }
+            && !p.data.condition.is_none()
+        {
+            s.data = p.data.clone();
+            sections.push(pending_sec.take().unwrap());
+        }
     }
     if let Some(s) = pending_sec.take() {
         sections.push(s);
