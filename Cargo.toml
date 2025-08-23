@@ -1,0 +1,63 @@
+[package]
+name = "sktest"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = [".", "bufr-to-yaml", "dwd-bufr-tables", "dwd-gts"]
+
+[workspace.dependencies]
+tinybufr = "0.1.2"
+anyhow = "1.0.98"
+atoi = "2.0.0"
+
+[dependencies]
+anyhow = { workspace = true }
+atoi = { workspace = true }
+bincode = { version = "2.0.1", features = ["serde"] }
+bytemuck = "1.23.1"
+bzip2 = "0.6.0"
+derive_more = { version = "2.0.1", features = ["display"] }
+dwd-bufr-tables = { path = "dwd-bufr-tables" }
+dwd-gts = { path = "dwd-gts" }
+enum_dispatch = "0.3.13"
+image = { version = "0.25.6", default-features = false, features = ["png"] }
+itertools = "0.14.0"
+jiff = { version = "0.2.15", features = ["serde"] }
+memchr = "2.7.5"
+proj4rs = "0.1.8"
+quick-xml = "0.38.0"
+regex = "1.11.1"
+serde = { version = "1.0.219", features = ["derive"] }
+skia-safe = { version = "0.87.0", features = [
+    "d3d",
+    "windows",
+    "textlayout",
+    "svg",
+] }
+tar = "0.4.44"
+tinybufr = { workspace = true }
+toml = "0.9.4"
+ureq = { version = "3.0.12", features = [
+    "gzip",
+    "rustls",
+], default-features = false }
+windows = { version = "0.61.3", features = [
+    "Win32",
+    "Win32_Graphics",
+    "Win32_Graphics_Dxgi",
+    "Win32_Graphics_Direct3D12",
+    "Win32_Graphics_Direct3D",
+    "Win32_Foundation",
+    "Win32_Graphics_Dxgi_Common",
+    "Win32_Graphics_Gdi",
+    "Win32_UI_HiDpi",
+    "Win32_UI_WindowsAndMessaging",
+] }
+windows-strings = "0.4.2"
+winit = "0.30.12"
+zip = { version = "4.3.0", default-features = false, features = ["deflate"] }
+
+[profile.release]
+codegen-units = 1
+lto = "fat"

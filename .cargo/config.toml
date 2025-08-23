@@ -1,0 +1,2 @@
+[target.'cfg(not(debug_assertions))']
+rustflags = ["-Ctarget-cpu=native"]
