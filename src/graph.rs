@@ -117,12 +117,10 @@ pub fn plan_in<'a>(rect: skia_safe::Rect, all_points: &'a [Datapoint]) -> (Plan<
         }
         if let Some(ref mut s) = pending_sec
             && ts.hour() >= 14
-        {
-            if !p.data.condition.is_none() {
+            && !p.data.condition.is_none() {
                 s.data = p.data.clone();
                 sections.push(pending_sec.take().unwrap());
             }
-        }
     }
     if let Some(s) = pending_sec.take() {
         sections.push(s);
@@ -261,7 +259,7 @@ pub fn create_rain_plan(plan: &Plan, horizontal_lines: &mut [HorizontalLine]) ->
         .points
         .iter()
         .filter_map(|it| it.data.precipitation)
-        .fold(0.0, |a, b| f32::max(a, b));
+        .fold(0.0, f32::max);
     if max_value == 0.0 {
         return None;
     };

@@ -71,8 +71,8 @@ fn read_rv(
     };
     let (Some(precision), Some(interval), Some(offset_min)) = (
         atoi::atoi::<u8>(&header[PR_OFFSET..PR_OFFSET + 2]),
-        atoi::atoi::<u8>(&header[INT_OFFSET..INT_OFFSET + 4].trim_ascii_start()),
-        atoi::atoi::<u8>(&header[VV_OFFSET..VV_OFFSET + 4].trim_ascii_start()),
+        atoi::atoi::<u8>(header[INT_OFFSET..INT_OFFSET + 4].trim_ascii_start()),
+        atoi::atoi::<u8>(header[VV_OFFSET..VV_OFFSET + 4].trim_ascii_start()),
     ) else {
         bail!("invalid other numbers")
     };

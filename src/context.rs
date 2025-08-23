@@ -50,7 +50,7 @@ impl Plans {
         let current = cache
             .observation
             .clone()
-            .or_else(|| merged.iter().filter(|x| x.is_report).last().cloned());
+            .or_else(|| merged.iter().filter(|x| x.is_report).next_back().cloned());
         let radar = graph::create_radar_plan(ctx.side_rect.with_inset((20.0, 0.0)), &cache.radar);
 
         Self {
@@ -90,7 +90,7 @@ impl Context {
     pub fn replan(&mut self) {
         let cache = self.cache.read().unwrap();
         cache.to_file(CONFIG.cache_file()).unwrap();
-        self.plans = Some(Plans::new(&*cache, &self.layout_ctx));
+        self.plans = Some(Plans::new(&cache, &self.layout_ctx));
     }
 
     pub fn relayout(&mut self, pipl: &mut Pipeline) {
@@ -123,7 +123,7 @@ impl Context {
                 .map(|s| {
                     (
                         Point::new(s.x, outer_rect.top),
-                        Point::new(s.x, outer_rect.bottom.into()),
+                        Point::new(s.x, outer_rect.bottom),
                     )
                 })
                 .collect(),

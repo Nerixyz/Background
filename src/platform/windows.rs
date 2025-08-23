@@ -112,8 +112,10 @@ fn find_monitor_rect() -> anyhow::Result<RECT> {
             bail!("Failed to find monitor at ({x}, {y})");
         }
 
-        let mut info = MONITORINFO::default();
-        info.cbSize = std::mem::size_of::<MONITORINFO>() as u32;
+        let mut info = MONITORINFO {
+            cbSize: std::mem::size_of::<MONITORINFO>() as u32,
+            ..Default::default()
+        };
         if !GetMonitorInfoW(hmon, &raw mut info as *mut _).as_bool() {
             bail!("Failed to get monitor info");
         }

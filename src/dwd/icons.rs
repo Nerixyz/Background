@@ -43,7 +43,7 @@ impl IconSet for super::icons::Msn {
             29 => (ThunderstormsV2, ThunderstormsV2),
             30 => (ThunderstormsV2, ThunderstormsV2),
             31 => (WindyV2, WindyV2),
-            1 | _ => (SunnyDayV3, ClearNightV3),
+            /* 1 | */ _ => (SunnyDayV3, ClearNightV3),
         };
 
         if is_night { night } else { day }.to_path().into()

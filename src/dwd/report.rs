@@ -33,7 +33,7 @@ pub fn get(station: PoiStation, cache: &RwLock<Cache>) -> anyhow::Result<bool> {
     }
 
     let mut data = lines
-        .filter_map(Result::ok)
+        .map_while(Result::ok)
         .map(|s| s.replace(',', "."))
         .filter_map(|it| {
             Datapoint::from_report(&columns, &it.split(';').collect::<Vec<&str>>()).ok()

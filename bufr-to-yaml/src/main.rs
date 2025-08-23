@@ -64,7 +64,7 @@ fn dump<R: Read>(
 ) -> anyhow::Result<R> {
     let header = HeaderSections::read(&mut bounded).unwrap();
     let data_spec =
-        DataSpec::from_data_description(&header.data_description_section, &tables).unwrap();
+        DataSpec::from_data_description(&header.data_description_section, tables).unwrap();
     let mut data_reader = DataReader::new(bounded, &data_spec).unwrap();
 
     loop {

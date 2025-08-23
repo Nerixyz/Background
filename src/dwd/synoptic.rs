@@ -54,13 +54,10 @@ fn last_observation_is_old(cache: &RwLock<Cache>) -> bool {
         return true; // no past observation
     };
 
-    match (jiff::Timestamp::now() - ts)
+    let is_new = matches!((jiff::Timestamp::now() - ts)
         .abs()
-        .total(jiff::Unit::Minute)
-    {
-        Ok(m) if m < 60.0 => false,
-        _ => true,
-    }
+        .total(jiff::Unit::Minute), Ok(m) if m < 60.0);
+    !is_new
 }
 
 fn try_old_reports(stations: &[String]) -> Option<Datapoint> {
@@ -155,17 +152,16 @@ fn read_file_to_point(mut r: impl Read, stations: &[String]) -> anyhow::Result<O
         }
     }
 
-    let merged =
-        points
-            .into_iter()
-            .filter_map(|x| x)
-            .fold(None, |r: Option<Datapoint>, v| match r {
-                Some(mut d) => {
-                    d.merge_from(&v);
-                    Some(d)
-                }
-                None => Some(v),
-            });
+    let merged = points
+        .into_iter()
+        .flatten()
+        .fold(None, |r: Option<Datapoint>, v| match r {
+            Some(mut d) => {
+                d.merge_from(&v);
+                Some(d)
+            }
+            None => Some(v),
+        });
 
     Ok(merged)
 }
@@ -201,12 +197,12 @@ const DESIRED_HEIGHT: f32 = 2.0;
 pub fn raw_bufr<R: Read>(
     mut bounded: R,
     tables: &Tables,
-    points: &mut Vec<Option<Datapoint>>,
+    points: &mut [Option<Datapoint>],
     stations: &[String],
 ) -> anyhow::Result<R> {
     let header = HeaderSections::read(&mut bounded).unwrap();
     let data_spec =
-        DataSpec::from_data_description(&header.data_description_section, &tables).unwrap();
+        DataSpec::from_data_description(&header.data_description_section, tables).unwrap();
     let mut data_reader = DataReader::new(bounded, &data_spec).unwrap();
 
     loop {
@@ -222,14 +218,14 @@ pub fn raw_bufr<R: Read>(
         let Some(idx) = stations.iter().position(|it| it == trimmed) else {
             continue;
         };
-        if let Some(mut p) = read_datapoint(&mut data_reader)? {
-            if let Some(existing) = points.get_mut(idx) {
-                if let Some(existing) = existing.as_mut() {
-                    p.merge_from(&existing);
-                    *existing = p;
-                } else {
-                    *existing = Some(p)
-                }
+        if let Some(mut p) = read_datapoint(&mut data_reader)?
+            && let Some(existing) = points.get_mut(idx)
+        {
+            if let Some(existing) = existing.as_mut() {
+                p.merge_from(existing);
+                *existing = p;
+            } else {
+                *existing = Some(p)
             }
         }
     }
@@ -375,9 +371,9 @@ fn read_int(r: &mut DataReader<impl Read>) -> anyhow::Result<Option<i32>> {
         Ok(DataEvent::Data {
             value: Value::Integer(i),
             ..
-        }) => return Ok(Some(i)),
-        Ok(_) => return Ok(None),
-        Err(e) => return Err(e.into()),
+        }) => Ok(Some(i)),
+        Ok(_) => Ok(None),
+        Err(e) => Err(e.into()),
     }
 }
 
@@ -408,18 +404,7 @@ impl VisitedGtsMessage {
 
 impl PartialOrd for VisitedGtsMessage {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        match self.day.partial_cmp(&other.day) {
-            Some(std::cmp::Ordering::Equal) => {}
-            Some(std::cmp::Ordering::Less) if self.day == 1 => {
-                return Some(std::cmp::Ordering::Greater);
-            }
-            ord => return ord,
-        }
-        match self.hour.partial_cmp(&other.hour) {
-            Some(std::cmp::Ordering::Equal) => {}
-            ord => return ord,
-        }
-        self.minute.partial_cmp(&other.minute)
+        Some(self.cmp(other))
     }
 }
 

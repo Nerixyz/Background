@@ -80,7 +80,7 @@ pub struct RadarReading {
     pub value: f32,
 }
 
-pub static ZONE: LazyLock<jiff::tz::TimeZone> = LazyLock::new(|| jiff::tz::TimeZone::system());
+pub static ZONE: LazyLock<jiff::tz::TimeZone> = LazyLock::new(jiff::tz::TimeZone::system);
 
 impl Datapoint {
     pub fn from_timestamp(timestamp: jiff::Timestamp, is_report: bool) -> Self {
@@ -115,8 +115,8 @@ impl Datapoint {
     }
 
     pub fn merge_series_ref(left: &[Datapoint], right: &[Datapoint]) -> Vec<Datapoint> {
-        left.into_iter()
-            .merge_join_by(right.into_iter(), |a, b| a.timestamp.cmp(&b.timestamp))
+        left.iter()
+            .merge_join_by(right, |a, b| a.timestamp.cmp(&b.timestamp))
             .map(|d| match d {
                 itertools::EitherOrBoth::Both(s, l) => {
                     let mut merged = s.clone();
@@ -131,7 +131,7 @@ impl Datapoint {
 
     pub fn merge_series_vec(left: Vec<Datapoint>, right: Vec<Datapoint>) -> Vec<Datapoint> {
         left.into_iter()
-            .merge_join_by(right.into_iter(), |a, b| a.timestamp.cmp(&b.timestamp))
+            .merge_join_by(right, |a, b| a.timestamp.cmp(&b.timestamp))
             .map(|d| match d {
                 itertools::EitherOrBoth::Both(mut s, l) => {
                     s.merge_from(&l);
@@ -179,47 +179,41 @@ impl Cache {
     pub fn to_file(&self, name: &str) -> anyhow::Result<()> {
         std::fs::write(
             name,
-            &bincode::encode_to_vec(&self, bincode::config::standard())?,
+            &bincode::encode_to_vec(self, bincode::config::standard())?,
         )?;
         Ok(())
     }
 
     pub fn from_file_or_default(name: &str) -> Self {
-        match Self::from_file(name) {
-            Ok(c) => c,
-            Err(_) => Self::default(),
-        }
+        Self::from_file(name).unwrap_or_default()
     }
 
     pub fn refetch(c: &Arc<RwLock<Self>>) -> anyhow::Result<bool> {
         let report_t = std::thread::spawn({
             let cache = c.clone();
-            move || report::get(CONFIG.poi_station(), &*cache)
+            move || report::get(CONFIG.poi_station(), &cache)
         });
         let radar_t = std::thread::spawn({
             let cache = c.clone();
-            move || radar::get(&*cache, CONFIG.radar_coords())
+            move || radar::get(&cache, CONFIG.radar_coords())
         });
         let synop_t = std::thread::spawn({
             let cache = c.clone();
-            move || synoptic::get(&*cache, CONFIG.synop_stations())
+            move || synoptic::get(&cache, CONFIG.synop_stations())
         });
-        let forecast = forecast::get(CONFIG.poi_station(), &*c)
+        let forecast = forecast::get(CONFIG.poi_station(), c)
             .inspect_err(|e| eprintln!("Failed to fetch forecast: {e}"))
             .unwrap_or(false);
         let report = report_t
-            .join()
-            .or_else(|_| Err(anyhow!("Failed to join")))?
+            .join().map_err(|_| anyhow!("Failed to join"))?
             .inspect_err(|e| eprintln!("Failed to fetch report: {e}"))
             .unwrap_or(false);
         let radar = radar_t
-            .join()
-            .or_else(|_| Err(anyhow!("Failed to join")))?
+            .join().map_err(|_| anyhow!("Failed to join"))?
             .inspect_err(|e| eprintln!("Failed to fetch radar: {e}"))
             .unwrap_or(false);
         let synop = synop_t
-            .join()
-            .or_else(|_| Err(anyhow!("Failed to join")))?
+            .join().map_err(|_| anyhow!("Failed to join"))?
             .inspect_err(|e| eprintln!("Failed to fetch synop: {e}"))
             .unwrap_or(false);
         Ok(forecast || report || radar || synop)
