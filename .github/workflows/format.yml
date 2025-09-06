@@ -14,7 +14,7 @@ jobs:
     name: Check Formatting (Rust)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install rust
         uses: dtolnay/rust-toolchain@master
@@ -30,9 +30,9 @@ jobs:
     name: Check Formatting (Prettier)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Check formatting with Prettier
-        uses: Nerixyz/actionsx-prettier@v3-adj
+        uses: Nerixyz/actionsx-prettier@v3
         with:
           args: -c .
