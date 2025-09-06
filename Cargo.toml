@@ -58,7 +58,7 @@ windows = { version = "0.61.3", features = [
 windows-registry = "0.6.0"
 windows-strings = "0.4.2"
 winit = "0.30.12"
-zip = { version = "4.3.0", default-features = false, features = ["deflate"] }
+zip = { version = "5.0.0", default-features = false, features = ["deflate"] }
 
 [profile.release]
 codegen-units = 1
