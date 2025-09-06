@@ -24,16 +24,23 @@ pub struct Application {
     clicked: bool,
     last_pos: PhysicalPosition<f64>,
     window_pos: Option<PhysicalPosition<i32>>,
+    as_background: bool,
 }
 
 impl ApplicationHandler<AppEvent> for Application {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
         assert!(self.window.is_none());
-        let window = DxWindow::new(event_loop, self.context.layout_ctx.image_size)
-            .expect("Failed to create window context");
+        let window = DxWindow::new(
+            event_loop,
+            self.context.layout_ctx.image_size,
+            !self.as_background,
+        )
+        .expect("Failed to create window context");
         let hwnd = HWND(u64::from(window.window.id()) as *mut _);
         self.window = Some(window);
-        platform::windows::setup_for_hwnd(hwnd).unwrap();
+        if self.as_background {
+            platform::windows::setup_for_hwnd(hwnd).unwrap();
+        }
     }
 
     fn window_event(
@@ -96,7 +103,7 @@ impl ApplicationHandler<AppEvent> for Application {
 }
 
 impl Application {
-    pub fn new(context: Context, pipl: Pipeline) -> Self {
+    pub fn new(context: Context, pipl: Pipeline, as_background: bool) -> Self {
         Self {
             window: None,
             context,
@@ -104,6 +111,7 @@ impl Application {
             clicked: false,
             last_pos: PhysicalPosition::new(0.0, 0.0),
             window_pos: None,
+            as_background,
         }
     }
 

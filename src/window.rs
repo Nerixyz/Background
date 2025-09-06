@@ -52,6 +52,7 @@ impl DxWindow {
     pub fn new(
         event_loop: &ActiveEventLoop,
         initial_size: skia_safe::Size,
+        visible: bool,
     ) -> anyhow::Result<Self> {
         let mut window_attributes = WindowAttributes::default().with_class_name("x-dx-window");
         window_attributes.decorations = false;
@@ -60,7 +61,7 @@ impl DxWindow {
             initial_size.height,
         )));
         window_attributes.title = "Background".into();
-        window_attributes.visible = false;
+        window_attributes.visible = visible;
 
         let window = event_loop
             .create_window(window_attributes)

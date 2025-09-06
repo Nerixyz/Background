@@ -451,7 +451,7 @@ mod r_colors {
 
     pub fn radar_color_for(v: f32) -> Color {
         match v {
-            0.0 => Color::TRANSPARENT,
+            0.0 => Color::from_argb(0, 0x28, 0x10, 0x9f),
             ..=0.5 => interpolate_color(Color::from_argb(10, 0x28, 0x10, 0x9f), C_0_5, v * 2.0),
             ..=1.5 => interpolate_color(C_0_5, C_1_5, v - 0.5),
             ..=4.5 => interpolate_color(C_1_5, C_4_5, (v - 1.5) / 3.0),

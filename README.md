@@ -12,8 +12,8 @@ TBD (there's a lot to do)
 
 - To get the icons (I'm using the icons from [msn.com](https://msn.com)),
   run `scripts/Get-Icons.ps1` in [PowerShell](https://github.com/PowerShell/powershell/releases) (you might need PowerShell 7).
-- Create a `bg.png` which contains your desired background - cropped to the monitor resolution.
-- Create a `config.toml`:
+- Create a `bg.png` (next to the executable) which contains your desired background - cropped to the monitor resolution.
+- Create a `config.toml` (next to the executable):
 
   ```toml
   station = 1234
@@ -34,3 +34,5 @@ TBD (there's a lot to do)
   ```
 
   Stations can be found on [dwd.de](https://www.dwd.de/DE/leistungen/met_verfahren_mosmix/mosmix_stationskatalog.cfg?view=nasPublication&nn=16102) (use the `ID`).
+
+- Run the app

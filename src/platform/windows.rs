@@ -1,3 +1,5 @@
+use std::env;
+
 use anyhow::{Context, bail};
 use windows::Win32::{
     Foundation::{HWND, LPARAM, POINT, RECT, WPARAM},
@@ -74,6 +76,24 @@ pub fn setup_for_hwnd(hwnd: HWND) -> anyhow::Result<()> {
             RDW_ERASE | RDW_INVALIDATE | RDW_FRAME | RDW_ALLCHILDREN,
         );
     }
+
+    Ok(())
+}
+
+pub fn add_self_to_autostart() -> windows_registry::Result<()> {
+    let key = windows_registry::CURRENT_USER
+        .create("Software\\Microsoft\\Windows\\CurrentVersion\\Run")?;
+    key.set_string(
+        env!("CARGO_BIN_NAME"),
+        env::current_exe().unwrap().as_os_str().to_string_lossy(),
+    )?;
+    Ok(())
+}
+
+pub fn remove_autostart() -> windows_registry::Result<()> {
+    let key = windows_registry::CURRENT_USER
+        .create("Software\\Microsoft\\Windows\\CurrentVersion\\Run")?;
+    key.remove_value(env!("CARGO_BIN_NAME"))?;
 
     Ok(())
 }
