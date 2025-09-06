@@ -1,86 +1,38 @@
 # Background
 
-This is my background 🙂. It's mainly for Windows with [Wallpaper Engine](https://store.steampowered.com/app/431960/Wallpaper_Engine/).
+This is my background 🙂. It really only shows the weather. I didn't want to use some web view, so I used Skia. But now it only works on Windows 11 (unless someone adds support for others).
 
-It uses the [DWD open-data server](https://opendata.dwd.de/) to get weather data.
+It uses the [DWD open-data server](https://opendata.dwd.de/) to get weather data (so it only works in Germany right now).
 
 # Images
 
-### Main Monitor
-
-![Main Monitor](https://i.imgur.com/HdG5gf1.png)
-
-### Second Monitor (yeah I'm still using a 4:3 one)
-
-![Second Monitor](https://i.imgur.com/lWTAfjY.png)
+TBD (there's a lot to do)
 
 # Setup
 
-- To get the icons (I'm using the icons from [Windy.com](https://windy.com)),
-  run `Get-Icons.ps1` in [PowerShell](https://github.com/PowerShell/powershell/releases) (you might need PowerShell 7).
-- Rename `.env.example` to `.env` and edit the station-id and optionally the icon set (`windy` or `msn`).
+- To get the icons (I'm using the icons from [msn.com](https://msn.com)),
+  run `scripts/Get-Icons.ps1` in [PowerShell](https://github.com/PowerShell/powershell/releases) (you might need PowerShell 7).
+- Create a `bg.png` (next to the executable) which contains your desired background - cropped to the monitor resolution.
+- Create a `config.toml` (next to the executable):
 
-  Stations can be found on [`weatherapi.nerixyz.de/stations`](https://weatherapi.nerixyz.de/stations) or [dwd.de](https://www.dwd.de/DE/leistungen/met_verfahren_mosmix/mosmix_stationskatalog.cfg?view=nasPublication&nn=16102).
+  ```toml
+  station = 1234
 
-- Run `pnpm i` to install the dependencies (you need pnpm).
-- Run `pnpm build` to build both backgrounds.
+  # Used for rain forecast
+  latitude = 52.1234
+  longitude = 9.1234
 
-### Setting up a local webserver
+  # During development for faster startup
+  cache_file = "cache.bin"
 
-I'm using [nginx](https://nginx.org) to host the SPA. This tutorial is for Windows :)
+  # Open on the monitor at this global position
+  monitor_at_pos = [0, 0]
 
-- Download [nginx](https://nginx.org/en/download.html).
-- Unpack it _somewhere_.
-- Download [nssm](https://nssm.cc/download).
-- Unpack the .exe for your architecture (you only need the exe).
-- Open a shell and run `nssm install nginx`.
-- In the GUI, set the `path` to the `nginx.exe` (the directory should be automatically set)
-- Navigate to the `IO` tab and set `Input (stdin)` to `start nginx`
-- Click `Install Service`
+  # Stations for weather reports
+  # Multiple can be specified (stations at the start take priority)
+  synop_stations = ["1234"]
+  ```
 
-#### Configuring Nginx
+  Stations can be found on [dwd.de](https://www.dwd.de/DE/leistungen/met_verfahren_mosmix/mosmix_stationskatalog.cfg?view=nasPublication&nn=16102) (use the `ID`).
 
-- In the nginx folder, open `conf/nginx.conf`
-- Delete the default server block and create two new ones, each pointing to the dist folder.
-- An example:
-
-`MAIN_PORT` and `SECOND_PORT` should be different and have a high number (e.g. 54879 and 54880).
-`MAIN_DIST_PATH` and `SECOND_DIST_PATH` should be with _forward slashes_ (e.g. `C:/something/dist`) and contain the path to the respective dist folder.
-
-```conf
-error_log logs/error.log warn;
-http {
-    include       mime.types;
-    default_type  application/octet-stream;
-
-    sendfile        on;
-    keepalive_timeout  65;
-    server {
-        listen       MAIN_PORT;
-        server_name  localhost;
-
-        root MAIN_DIST_PATH;
-    }
-    server {
-        listen       SECOND_PORT;
-        server_name  localhost;
-
-        root SECOND_DIST_PATH;
-    }
-}
-```
-
-- Open the TaskManager
-- Go to the `Services` tab
-- Start the `nginx` service (right click)
-
-### Setting up the Wallpaper
-
-Wallpaper Engine supports websites as wallpapers through CEF, so we'll use that.
-
-- Open the Wallpaper Engine GUI.
-- For each monitor:
-  - At the bottom click `Open Wallpaper`
-  - Select `Open from URL`
-  - Enter the URL `http://localhost:MAIN_OR_SECOND_PORT` (use the port you specified in the `nginx.conf`)
-  - Select the Wallpaper
+- Run the app

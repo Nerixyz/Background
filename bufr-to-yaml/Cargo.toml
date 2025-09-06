@@ -1,0 +1,11 @@
+[package]
+name = "bufr-to-yaml"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = { workspace = true }
+dwd-bufr-tables = { path = "../dwd-bufr-tables" }
+dwd-gts = { path = "../dwd-gts" }
+tinybufr = { workspace = true }
+atoi = { workspace = true }

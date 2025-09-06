@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: "/"
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "deps(cargo)"
+    groups:
+      rust:
+        patterns:
+          - "*"
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "deps(ci)"
+    groups:
+      actions:
+        patterns:
+          - "*"
