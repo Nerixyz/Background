@@ -1078,7 +1078,7 @@ dependencies = [
  "ureq",
  "windows",
  "windows-registry",
- "windows-strings 0.4.2",
+ "windows-strings 0.5.0",
  "winit",
  "zip",
 ]
