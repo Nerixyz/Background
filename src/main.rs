@@ -56,6 +56,10 @@ enum AutostartCommand {
     Remove,
 }
 
+fn cd_to_exe() {
+    std::env::set_current_dir(std::env::current_exe().unwrap().parent().unwrap()).unwrap();
+}
+
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
     if let Some(Command::Autostart { command }) = &args.command {
@@ -65,6 +69,8 @@ fn main() -> anyhow::Result<()> {
         }
         return Ok(());
     }
+
+    cd_to_exe();
 
     let bg_img = Image::from_encoded(
         Data::from_filename("bg.png").ok_or_else(|| anyhow!("Failed to read bg.png"))?,
