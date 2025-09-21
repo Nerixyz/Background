@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use jiff::ToSpan;
 use skia_safe::{Color, Path, Point, Rect, Shader};
 
