@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use jiff::ToSpan;
 use skia_safe::{Color, Path, Point, Rect, Shader};
 
@@ -12,6 +13,7 @@ struct GraphPoint<'a> {
     pub data: &'a Datapoint,
 }
 
+#[derive(Debug)]
 pub struct Section {
     pub x: f32,
     pub text: String,
@@ -73,7 +75,6 @@ pub fn plan_in<'a>(rect: skia_safe::Rect, all_points: &'a [Datapoint]) -> (Plan<
 
     let my_tz = jiff::tz::db().get("Europe/Berlin").unwrap();
 
-    let mut cur_day = plan.last().map(|p| p.data.local_ts.day()).unwrap_or(42);
     for (_, p) in plan
         .iter()
         .enumerate()
@@ -89,7 +90,18 @@ pub fn plan_in<'a>(rect: skia_safe::Rect, all_points: &'a [Datapoint]) -> (Plan<
         });
     }
 
-    let fut_start = plan.len();
+    let first_day = plan.first().map(|p| p.data.local_ts.day()).unwrap_or(42);
+    let mut cur_day = plan.last().map(|p| p.data.local_ts.day()).unwrap_or(42);
+    let mut fut_start = plan.len();
+
+    // The last section of the near future will be merged with the far future and show as a day
+    if cur_day == first_day + 1 {
+        sections.sort_by_key(|s| s.data.timestamp);
+        sections.pop();
+
+        cur_day -= 1;
+        fut_start -= 1;
+    }
 
     calc_x_offsets(
         far_fut,
@@ -112,7 +124,7 @@ pub fn plan_in<'a>(rect: skia_safe::Rect, all_points: &'a [Datapoint]) -> (Plan<
                 text: ts.strftime("%a").to_string(),
                 data: p.data.clone(),
             });
-            cur_day = ts.day();
+            cur_day = dbg!(ts.day());
             continue;
         }
         if let Some(ref mut s) = pending_sec
