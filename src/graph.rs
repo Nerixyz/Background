@@ -124,7 +124,7 @@ pub fn plan_in<'a>(rect: skia_safe::Rect, all_points: &'a [Datapoint]) -> (Plan<
                 text: ts.strftime("%a").to_string(),
                 data: p.data.clone(),
             });
-            cur_day = dbg!(ts.day());
+            cur_day = ts.day();
             continue;
         }
         if let Some(ref mut s) = pending_sec
