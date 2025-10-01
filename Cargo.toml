@@ -8,7 +8,7 @@ members = [".", "bufr-to-yaml", "dwd-bufr-tables", "dwd-gts"]
 
 [workspace.dependencies]
 tinybufr = "0.1.2"
-anyhow = "1.0.98"
+anyhow = "1.0.100"
 atoi = "2.0.0"
 
 [dependencies]
