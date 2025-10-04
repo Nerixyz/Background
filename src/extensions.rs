@@ -25,7 +25,7 @@ pub trait RectExt {
     fn top_right(&self) -> Point;
     fn bottom_right(&self) -> Point;
 
-    fn moved_by(&self, x: f32, y: f32) -> Self;
+    fn moved_by(&self, p: Point) -> Self;
 }
 
 impl RectExt for Rect {
@@ -82,12 +82,12 @@ impl RectExt for Rect {
         }
     }
 
-    fn moved_by(&self, x: f32, y: f32) -> Self {
+    fn moved_by(&self, p: Point) -> Self {
         Self {
-            left: self.left + x,
-            top: self.top + y,
-            right: self.right + x,
-            bottom: self.bottom + y,
+            left: self.left + p.x,
+            top: self.top + p.y,
+            right: self.right + p.x,
+            bottom: self.bottom + p.y,
         }
     }
 }

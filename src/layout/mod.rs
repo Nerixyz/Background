@@ -22,7 +22,7 @@ impl LayoutCtx {
             (image_size.width / 2.0, image_size.height - 300.0),
             (750.0, 200.0),
         )
-        .moved_by(-100.0, 0.0);
+        .moved_by(Point::new(-100.0, 0.0));
 
         let main_rect = outer_main_rect.with_bottom_offset(-50.0);
         let side_rect = Rect::from_xywh(

@@ -260,16 +260,12 @@ impl Context {
         ));
 
         if let Some(temp) = current.temperature {
-            let blob = TextBlob::new(
-                format!("{temp:.*}°", if temp.fract() == 0.0 { 0 } else { 1 }),
+            let (blob, pos) = align_text(
+                &format!("{temp:.*}°", if temp.fract() == 0.0 { 0 } else { 1 }),
                 &self.layout_ctx.fonts.large,
-            )
-            .unwrap();
-            let pos = self.layout_ctx.side_rect.top_right()
-                + Point::new(
-                    -blob.bounds().width() - 20.0,
-                    40.0 + blob.bounds().height() / 2.0,
-                );
+                self.layout_ctx.side_rect.top_right() + Point::new(-20.0, 20.0),
+                Align::TopRight,
+            );
             pipl.add(TextItem {
                 blob,
                 pos,
