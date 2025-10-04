@@ -30,7 +30,7 @@ proj4rs = "0.1.8"
 quick-xml = "0.38.0"
 regex = "1.11.1"
 serde = { version = "1.0.219", features = ["derive"] }
-skia-safe = { version = "0.87.0", features = [
+skia-safe = { version = "0.89.0", features = [
     "d3d",
     "windows",
     "textlayout",
@@ -43,7 +43,7 @@ ureq = { version = "3.0.12", features = [
     "gzip",
     "rustls",
 ], default-features = false }
-windows = { version = "0.61.3", features = [
+windows = { version = "0.62.1", features = [
     "Win32",
     "Win32_Graphics",
     "Win32_Graphics_Dxgi",
@@ -56,7 +56,7 @@ windows = { version = "0.61.3", features = [
     "Win32_UI_WindowsAndMessaging",
 ] }
 windows-registry = "0.6.0"
-windows-strings = "0.4.2"
+windows-strings = "0.5.0"
 winit = "0.30.12"
 zip = { version = "5.0.0", default-features = false, features = ["deflate"] }
 
