@@ -5,7 +5,7 @@ use std::{
 
 use anyhow::bail;
 
-use crate::dwd::{Cache, RadarReading, ZONE, get_etag, needs_fetch};
+use crate::{Cache, RadarReading, ZONE, get_etag, needs_fetch};
 
 const STATIC_HEADER_LEN: usize = 91;
 const DATE_0_OFFSET: usize = 2;

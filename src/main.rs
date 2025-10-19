@@ -14,10 +14,7 @@ use crate::paint::{PaintCtx, Pipeline};
 mod application;
 mod config;
 mod context;
-mod dwd;
 mod extensions;
-mod graph;
-mod graphics;
 mod icons;
 mod layout;
 mod paint;
@@ -78,7 +75,7 @@ fn main() -> anyhow::Result<()> {
     .ok_or_else(|| anyhow!("Failed to read bg.png as image"))?;
 
     let mut context = Context::new(
-        dwd::Cache::from_file_or_default(CONFIG.cache_file()),
+        dwd_fetch::Cache::from_file_or_default(CONFIG.cache_file()),
         bg_img,
     );
     if !context.update() {

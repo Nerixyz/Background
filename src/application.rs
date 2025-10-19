@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use dwd_fetch::Cache;
 use windows::Win32::Foundation::HWND;
 use winit::{
     application::ApplicationHandler,
@@ -10,7 +11,7 @@ use winit::{
     window::WindowId,
 };
 
-use crate::{context::Context, dwd::Cache, paint::Pipeline, platform, window::DxWindow};
+use crate::{config::CONFIG, context::Context, paint::Pipeline, platform, window::DxWindow};
 
 pub enum AppEvent {
     Refresh,
@@ -127,7 +128,7 @@ impl Application {
         std::thread::spawn(move || {
             loop {
                 std::thread::sleep(Duration::from_secs(30));
-                if Cache::refetch(&cache).unwrap_or_default() {
+                if Cache::refetch(&cache, CONFIG.dwd()).unwrap_or_default() {
                     let _ = proxy.send_event(AppEvent::Refresh);
                     pending_ticks = REPAINT_TICKS;
                 }

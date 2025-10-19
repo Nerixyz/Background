@@ -1,6 +1,6 @@
 use skia_safe::{FontMgr, Point, Rect, Size};
 
-use crate::{extensions::RectExt, graphics::Fonts};
+use skia_util::{RectExt, fonts::Fonts};
 
 pub mod text;
 

@@ -5,10 +5,8 @@ use skia_safe::{
 };
 use std::{collections::HashMap, fs, marker::PhantomData, path::PathBuf};
 
-use crate::{
-    dwd::{Datapoint, icons::IconSet},
-    paint::SvgItem,
-};
+use crate::paint::SvgItem;
+use dwd_fetch::{Datapoint, icons::IconSet};
 
 pub struct IconRenderer<I> {
     cache: HashMap<PathBuf, Option<Dom>>,

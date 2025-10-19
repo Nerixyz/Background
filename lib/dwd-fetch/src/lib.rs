@@ -4,12 +4,14 @@ use std::{
 };
 
 use anyhow::anyhow;
+use icons::IconSet;
 use itertools::Itertools;
 
-use crate::{config::CONFIG, dwd::icons::IconSet, extensions::OptionExt};
+use crate::option_ext::OptionExt;
 
 pub mod forecast;
 pub mod icons;
+mod option_ext;
 pub mod radar;
 pub mod report;
 pub mod synoptic;
@@ -78,6 +80,13 @@ pub struct RadarReading {
     pub local_ts: jiff::Zoned,
     // In mm/h
     pub value: f32,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct Config {
+    pub poi_station: PoiStation,
+    pub radar_coords: (usize, usize),
+    pub synop_stations: Vec<String>,
 }
 
 pub static ZONE: LazyLock<jiff::tz::TimeZone> = LazyLock::new(jiff::tz::TimeZone::system);
@@ -188,38 +197,43 @@ impl Cache {
         Self::from_file(name).unwrap_or_default()
     }
 
-    pub fn refetch(c: &Arc<RwLock<Self>>) -> anyhow::Result<bool> {
-        let report_t = std::thread::spawn({
-            let cache = c.clone();
-            move || report::get(CONFIG.poi_station(), &cache)
-        });
-        let radar_t = std::thread::spawn({
-            let cache = c.clone();
-            move || radar::get(&cache, CONFIG.radar_coords())
-        });
-        let synop_t = std::thread::spawn({
-            let cache = c.clone();
-            move || synoptic::get(&cache, CONFIG.synop_stations())
-        });
-        let forecast = forecast::get(CONFIG.poi_station(), c)
-            .inspect_err(|e| eprintln!("Failed to fetch forecast: {e}"))
-            .unwrap_or(false);
-        let report = report_t
-            .join()
-            .map_err(|_| anyhow!("Failed to join"))?
-            .inspect_err(|e| eprintln!("Failed to fetch report: {e}"))
-            .unwrap_or(false);
-        let radar = radar_t
-            .join()
-            .map_err(|_| anyhow!("Failed to join"))?
-            .inspect_err(|e| eprintln!("Failed to fetch radar: {e}"))
-            .unwrap_or(false);
-        let synop = synop_t
-            .join()
-            .map_err(|_| anyhow!("Failed to join"))?
-            .inspect_err(|e| eprintln!("Failed to fetch synop: {e}"))
-            .unwrap_or(false);
-        Ok(forecast || report || radar || synop)
+    pub fn refetch(c: &Arc<RwLock<Self>>, config: &Config) -> anyhow::Result<bool> {
+        std::thread::scope(|s| {
+            let report_t = s.spawn({
+                let cache = c.clone();
+                let station = config.poi_station;
+                move || report::get(station, &cache)
+            });
+            let radar_t = s.spawn({
+                let cache = c.clone();
+                let coords = config.radar_coords;
+                move || radar::get(&cache, coords)
+            });
+            let synop_t = s.spawn({
+                let cache = c.clone();
+                let stations = &config.synop_stations;
+                move || synoptic::get(&cache, stations)
+            });
+            let forecast = forecast::get(config.poi_station, c)
+                .inspect_err(|e| eprintln!("Failed to fetch forecast: {e}"))
+                .unwrap_or(false);
+            let report = report_t
+                .join()
+                .map_err(|_| anyhow!("Failed to join"))?
+                .inspect_err(|e| eprintln!("Failed to fetch report: {e}"))
+                .unwrap_or(false);
+            let radar = radar_t
+                .join()
+                .map_err(|_| anyhow!("Failed to join"))?
+                .inspect_err(|e| eprintln!("Failed to fetch radar: {e}"))
+                .unwrap_or(false);
+            let synop = synop_t
+                .join()
+                .map_err(|_| anyhow!("Failed to join"))?
+                .inspect_err(|e| eprintln!("Failed to fetch synop: {e}"))
+                .unwrap_or(false);
+            Ok(forecast || report || radar || synop)
+        })
     }
 }
 

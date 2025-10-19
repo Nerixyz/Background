@@ -1,15 +1,13 @@
 use std::sync::{Arc, RwLock};
 
 use skia_safe::{Color, Image, Paint, Point, RRect, Rect, Size, TextBlob};
+use skia_util::{
+    RectExt,
+    gradient::{mask_gradient_horiz, mask_gradient_vert},
+};
 
 use crate::{
     config::CONFIG,
-    dwd::{Cache, Datapoint, icons::Msn},
-    extensions::RectExt,
-    graph::{
-        self, HorizontalLine, PPrecipitationPlan, RadarPlan, RainPlan, SectionPlan, TemperaturePlan,
-    },
-    graphics::{mask_gradient_horiz, mask_gradient_vert},
     icons::IconRenderer,
     layout::{
         LayoutCtx,
@@ -19,6 +17,11 @@ use crate::{
         BlurredSquircleItem, CurrentTime, ImageItem, LineItem, LinesItem, PaintLineItem, PathItem,
         Pipeline, RestoreOp, RrectItem, ShaderClipOp, TextItem, TextsItem,
     },
+};
+use dwd_fetch::{Cache, Datapoint, icons::Msn};
+use weather_layout::{
+    self, Colorful, HorizontalLine, PPrecipitationPlan, RadarPlan, RainPlan, SectionPlan,
+    TemperaturePlan,
 };
 
 pub struct Context {
@@ -43,15 +46,19 @@ pub struct Plans {
 impl Plans {
     pub fn new(cache: &Cache, ctx: &LayoutCtx) -> Self {
         let merged = Datapoint::merge_series_ref(&cache.report, &cache.forecast);
-        let (overall, sections) = graph::plan_in(ctx.main_rect, &merged);
-        let (temperature, mut horizontal_lines) = graph::create_temperature_path(&overall);
-        let rain = graph::create_rain_plan(&overall, &mut horizontal_lines);
-        let p_precipitation = graph::create_p_precipitation_plan(&overall);
+        let (overall, sections) = weather_layout::plan_in(ctx.main_rect, &merged);
+        let (temperature, mut horizontal_lines) =
+            weather_layout::create_temperature_path::<Colorful>(&overall);
+        let rain = weather_layout::create_rain_plan::<Colorful>(&overall, &mut horizontal_lines);
+        let p_precipitation = weather_layout::create_p_precipitation_plan(&overall);
         let current = cache
             .observation
             .clone()
             .or_else(|| merged.iter().filter(|x| x.is_report).next_back().cloned());
-        let radar = graph::create_radar_plan(ctx.side_rect.with_inset((20.0, 0.0)), &cache.radar);
+        let radar = weather_layout::create_radar_plan::<Colorful>(
+            ctx.side_rect.with_inset((20.0, 0.0)),
+            &cache.radar,
+        );
 
         Self {
             sections,
@@ -79,7 +86,7 @@ impl Context {
     }
 
     pub fn update(&mut self) -> bool {
-        if Cache::refetch(&self.cache).unwrap() {
+        if Cache::refetch(&self.cache, CONFIG.dwd()).unwrap() {
             self.replan();
             true
         } else {

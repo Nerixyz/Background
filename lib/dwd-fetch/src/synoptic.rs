@@ -10,7 +10,7 @@ use dwd_gts::GtsHeader;
 use regex::Regex;
 use tinybufr::{DataEvent, DataReader, DataSpec, HeaderSections, Tables, Value, XY};
 
-use crate::dwd::{Cache, Datapoint, WeatherCondition, get_etag, needs_fetch};
+use crate::{Cache, Datapoint, WeatherCondition, get_etag, needs_fetch};
 
 const URL: &str = "https://opendata.dwd.de/weather/weather_reports/synoptic/germany/Z__C_EDZW_latest_bda01%2Csynop_bufr_GER_999999_999999__MW_XXX.bin";
 const LISTING_URL: &str = "https://opendata.dwd.de/weather/weather_reports/synoptic/germany";

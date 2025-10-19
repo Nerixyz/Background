@@ -1,0 +1,25 @@
+[package]
+name = "dwd-fetch"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = { workspace = true }
+bincode = { workspace = true }
+jiff = { workspace = true }
+itertools = { workspace = true }
+serde = { workspace = true }
+ureq = { workspace = true }
+derive_more = { workspace = true }
+memchr = { workspace = true }
+# proj4rs = { workspace = true }
+quick-xml = { workspace = true }
+zip = { workspace = true }
+bzip2 = { workspace = true }
+tar = { workspace = true }
+atoi = { workspace = true }
+bytemuck = { workspace = true }
+tinybufr = { workspace = true }
+dwd-bufr-tables = { workspace = true }
+dwd-gts = { workspace = true }
+regex = { workspace = true }

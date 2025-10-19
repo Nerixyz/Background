@@ -4,25 +4,27 @@ version = "0.1.0"
 edition = "2024"
 
 [workspace]
-members = [".", "bufr-to-yaml", "dwd-bufr-tables", "dwd-gts"]
+members = [
+    ".",
+    "bin/picolini-srv",
+    "lib/bufr-to-yaml",
+    "lib/dwd-bufr-tables",
+    "lib/dwd-fetch",
+    "lib/dwd-gts",
+    "lib/skia-util",
+    "lib/weather-layout",
+]
 
 [workspace.dependencies]
-tinybufr = "0.1.2"
 anyhow = "1.0.100"
 atoi = "2.0.0"
-
-[dependencies]
-anyhow = { workspace = true }
-atoi = { workspace = true }
 bincode = { version = "2.0.1", features = ["serde"] }
 bytemuck = "1.23.1"
 bzip2 = "0.6.0"
-clap = { version = "4.5.47", features = ["derive"] }
 derive_more = { version = "2.0.1", features = ["display"] }
-dwd-bufr-tables = { path = "dwd-bufr-tables" }
-dwd-gts = { path = "dwd-gts" }
-enum_dispatch = "0.3.13"
-image = { version = "0.25.6", default-features = false, features = ["png"] }
+dwd-bufr-tables = { path = "lib/dwd-bufr-tables" }
+dwd-fetch = { path = "lib/dwd-fetch" }
+dwd-gts = { path = "lib/dwd-gts" }
 itertools = "0.14.0"
 jiff = { version = "0.2.15", features = ["serde"] }
 memchr = "2.7.5"
@@ -30,19 +32,47 @@ proj4rs = "0.1.8"
 quick-xml = "0.38.0"
 regex = "1.11.1"
 serde = { version = "1.0.219", features = ["derive"] }
+skia-util = { path = "lib/skia-util" }
+tar = "0.4.44"
+tinybufr = "0.1.2"
+ureq = { version = "3.0.12", features = [
+    "gzip",
+    "rustls",
+], default-features = false }
+weather-layout = { path = "lib/weather-layout" }
+zip = { version = "5.0.0", default-features = false, features = ["deflate"] }
+
+[dependencies]
+anyhow = { workspace = true }
+atoi = { workspace = true }
+bincode = { workspace = true }
+bytemuck = { workspace = true }
+bzip2 = { workspace = true }
+clap = { version = "4.5.47", features = ["derive"] }
+derive_more = { workspace = true }
+dwd-bufr-tables = { workspace = true }
+dwd-fetch = { workspace = true }
+dwd-gts = { workspace = true }
+enum_dispatch = "0.3.13"
+image = { version = "0.25.6", default-features = false, features = ["png"] }
+jiff = { workspace = true }
+memchr = { workspace = true }
+proj4rs = { workspace = true }
+quick-xml = { workspace = true }
+regex = { workspace = true }
+serde = { workspace = true }
 skia-safe = { version = "0.89.0", features = [
     "d3d",
     "windows",
     "textlayout",
     "svg",
 ] }
-tar = "0.4.44"
+skia-util = { workspace = true }
+tar = { workspace = true }
 tinybufr = { workspace = true }
 toml = "0.9.4"
-ureq = { version = "3.0.12", features = [
-    "gzip",
-    "rustls",
-], default-features = false }
+ureq = { workspace = true }
+weather-layout = { workspace = true }
 windows = { version = "0.62.1", features = [
     "Win32",
     "Win32_Graphics",
@@ -58,7 +88,7 @@ windows = { version = "0.62.1", features = [
 windows-registry = "0.6.0"
 windows-strings = "0.5.0"
 winit = "0.30.12"
-zip = { version = "5.0.0", default-features = false, features = ["deflate"] }
+zip = { workspace = true }
 
 [profile.release]
 codegen-units = 1

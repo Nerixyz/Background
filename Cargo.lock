@@ -608,6 +608,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "dwd-fetch"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "atoi",
+ "bincode",
+ "bytemuck",
+ "bzip2",
+ "derive_more",
+ "dwd-bufr-tables",
+ "dwd-gts",
+ "itertools 0.14.0",
+ "jiff",
+ "memchr",
+ "quick-xml 0.38.3",
+ "regex",
+ "serde",
+ "tar",
+ "tinybufr",
+ "ureq",
+ "zip",
+]
+
+[[package]]
 name = "dwd-gts"
 version = "0.1.0"
 dependencies = [
@@ -1067,10 +1091,10 @@ dependencies = [
  "clap",
  "derive_more",
  "dwd-bufr-tables",
+ "dwd-fetch",
  "dwd-gts",
  "enum_dispatch",
  "image",
- "itertools 0.14.0",
  "jiff",
  "memchr",
  "proj4rs",
@@ -1078,10 +1102,12 @@ dependencies = [
  "regex",
  "serde",
  "skia-safe",
+ "skia-util",
  "tar",
  "tinybufr",
  "toml",
  "ureq",
+ "weather-layout",
  "windows",
  "windows-registry",
  "windows-strings",
@@ -1398,6 +1424,10 @@ name = "percent-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
+
+[[package]]
+name = "picolini-srv"
+version = "0.1.0"
 
 [[package]]
 name = "pin-project"
@@ -1844,6 +1874,13 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "skia-util"
+version = "0.1.0"
+dependencies = [
+ "skia-safe",
 ]
 
 [[package]]
@@ -2392,6 +2429,16 @@ dependencies = [
  "log",
  "once_cell",
  "pkg-config",
+]
+
+[[package]]
+name = "weather-layout"
+version = "0.1.0"
+dependencies = [
+ "dwd-fetch",
+ "jiff",
+ "skia-safe",
+ "skia-util",
 ]
 
 [[package]]

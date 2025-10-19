@@ -1,9 +1,6 @@
+use crate::paint::{PaintCtx, Paintable};
 use skia_safe::{Canvas, Rect, svg::Dom};
-
-use crate::{
-    extensions::RectExt,
-    paint::{PaintCtx, Paintable},
-};
+use skia_util::RectExt;
 
 pub struct SvgItem {
     pub dom: Dom,

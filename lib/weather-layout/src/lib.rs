@@ -1,11 +1,15 @@
 use jiff::ToSpan;
 use skia_safe::{Color, Path, Point, Rect, Shader};
+use skia_util::RectExt;
 
-use crate::{
-    dwd::{Datapoint, RadarReading},
-    extensions::RectExt,
-    graphics::AutoGradientBuilder,
-};
+use dwd_fetch::{Datapoint, RadarReading};
+use skia_util::gradient::AutoGradientBuilder;
+
+mod gradients;
+
+pub use gradients::{ColorMap, Colorful, Grayscale};
+
+use crate::gradients::{create_r_gradient, create_t_gradient};
 
 struct GraphPoint<'a> {
     pub x_pos: f32,
@@ -178,7 +182,9 @@ pub struct TemperaturePlan {
     pub shader: Shader,
 }
 
-pub fn create_temperature_path(plan: &Plan) -> (Option<TemperaturePlan>, Vec<HorizontalLine>) {
+pub fn create_temperature_path<M: ColorMap>(
+    plan: &Plan,
+) -> (Option<TemperaturePlan>, Vec<HorizontalLine>) {
     // first, determine the bounds
     let mut minmax = None;
     let mut n_points = 0;
@@ -234,7 +240,7 @@ pub fn create_temperature_path(plan: &Plan) -> (Option<TemperaturePlan>, Vec<Hor
     let temp_to_y_scale = plan.rect.height() / (max - min).max(1.0);
     let temp_to_y = |temp: f32| plan.rect.bottom + (min - temp) * temp_to_y_scale;
 
-    let shader = create_t_gradient(temp_to_y(t_colors::MIN_T), temp_to_y(t_colors::MAX_T));
+    let shader = create_t_gradient::<M>(temp_to_y(M::MIN_T), temp_to_y(M::MAX_T));
     let mut horizontal = Vec::new();
     {
         let mut t = min + 5.0;
@@ -266,7 +272,10 @@ pub struct RainPlan {
     pub gradient: Shader,
 }
 
-pub fn create_rain_plan(plan: &Plan, horizontal_lines: &mut [HorizontalLine]) -> Option<RainPlan> {
+pub fn create_rain_plan<M: ColorMap>(
+    plan: &Plan,
+    horizontal_lines: &mut [HorizontalLine],
+) -> Option<RainPlan> {
     let max_value = plan
         .points
         .iter()
@@ -297,7 +306,7 @@ pub fn create_rain_plan(plan: &Plan, horizontal_lines: &mut [HorizontalLine]) ->
             plan.rect.bottom - (value * area_height / max_value),
         );
         path.cubic_to(pending_point, (cur.x_pos, cur_point.y), cur_point);
-        gradient.put(r_colors::radar_color_for(value), cur_point.x);
+        gradient.put(M::map_rain(value), cur_point.x);
         pending_point = Point::new(next.x_pos, cur_point.y);
     }
     let end = Point::new(pending_point.x, plan.rect.bottom);
@@ -357,7 +366,10 @@ pub struct RadarPlan {
     pub end_text: XLabel,
 }
 
-pub fn create_radar_plan(inner_rect: Rect, values: &[RadarReading]) -> Option<RadarPlan> {
+pub fn create_radar_plan<M: ColorMap>(
+    inner_rect: Rect,
+    values: &[RadarReading],
+) -> Option<RadarPlan> {
     if values.len() < 2 || values.iter().all(|v| v.value == 0.0) {
         return None;
     }
@@ -374,7 +386,7 @@ pub fn create_radar_plan(inner_rect: Rect, values: &[RadarReading]) -> Option<Ra
         text: r.local_ts.strftime("%H:%M").to_string(),
     };
 
-    let shader = create_r_gradient(values, (inner_rect.left, inner_rect.right), reading_to_x);
+    let shader = create_r_gradient::<M>(values, (inner_rect.left, inner_rect.right), reading_to_x);
     let is_raining = values.first().unwrap().value != 0.0;
     let upper_label = if is_raining {
         values.iter().find(|x| x.value == 0.0).map(reading_to_lbl)
@@ -390,115 +402,4 @@ pub fn create_radar_plan(inner_rect: Rect, values: &[RadarReading]) -> Option<Ra
         start_text,
         end_text,
     })
-}
-
-mod t_colors {
-    use skia_safe::{Color, scalar};
-
-    // 40°
-    const C_40: Color = Color::from_rgb(247, 15, 92);
-    const P_40: scalar = 1.0;
-    // 30°
-    const C_30: Color = Color::from_rgb(247, 15, 15);
-    const P_30: scalar = pos_of(30.0);
-    // 20°
-    const C_20: Color = Color::from_rgb(255, 149, 0);
-    const P_20: scalar = pos_of(20.0);
-    // 10°
-    const C_10: Color = Color::from_rgb(255, 247, 0);
-    const P_10: scalar = pos_of(10.0);
-    // 5°
-    const C_5: Color = Color::from_rgb(85, 204, 0);
-    const P_5: scalar = pos_of(5.0);
-    // 0°
-    const C_0: Color = Color::from_rgb(18, 230, 230);
-    const P_0: scalar = pos_of(0.0);
-    // -5°
-    const C_N5: Color = Color::from_rgb(18, 138, 230);
-    const P_N5: scalar = pos_of(-5.0);
-    // -10°
-    const C_N10: Color = Color::from_rgb(128, 18, 230);
-    const P_N10: scalar = pos_of(-10.0);
-    // -20°
-    const C_N20: Color = Color::from_rgb(227, 14, 206);
-    const P_N20: scalar = 0.0;
-
-    pub const COLORS: &[skia_safe::Color] = &[C_N20, C_N10, C_N5, C_0, C_5, C_10, C_20, C_30, C_40];
-    pub const POS: &[scalar] = &[P_N20, P_N10, P_N5, P_0, P_5, P_10, P_20, P_30, P_40];
-
-    pub const MIN_T: f32 = -20.0;
-    pub const MAX_T: f32 = 40.0;
-
-    const fn pos_of(v: scalar) -> scalar {
-        (v - MIN_T) / (MAX_T - MIN_T)
-    }
-}
-
-fn create_t_gradient(bottom: f32, top: f32) -> Shader {
-    skia_safe::gradient_shader::linear(
-        ((0.0, bottom), (0.0, top)),
-        t_colors::COLORS,
-        t_colors::POS,
-        skia_safe::TileMode::Clamp,
-        None,
-        None,
-    )
-    .unwrap()
-}
-
-mod r_colors {
-    use skia_safe::Color;
-
-    use crate::graph::interpolate_color;
-
-    // <= 0.5mm
-    const C_0_5: Color = Color::from_rgb(0x00, 0x92, 0x91);
-    // <= 1.5mm
-    const C_1_5: Color = Color::from_rgb(0x40, 0xc7, 0x60);
-    // <= 4.5mm
-    const C_4_5: Color = Color::from_rgb(0xdc, 0xd3, 0x18);
-    // rest
-    const C_REST: Color = Color::from_rgb(0x9b, 0x0f, 0x6d);
-
-    pub fn radar_color_for(v: f32) -> Color {
-        match v {
-            0.0 => Color::from_argb(0, 0x28, 0x10, 0x9f),
-            ..=0.5 => interpolate_color(Color::from_argb(10, 0x28, 0x10, 0x9f), C_0_5, v * 2.0),
-            ..=1.5 => interpolate_color(C_0_5, C_1_5, v - 0.5),
-            ..=4.5 => interpolate_color(C_1_5, C_4_5, (v - 1.5) / 3.0),
-            _ => C_REST,
-        }
-    }
-}
-
-fn create_r_gradient(
-    values: &[RadarReading],
-    x_range: (f32, f32),
-    reading_to_x: impl Fn(&RadarReading) -> f32,
-) -> Shader {
-    let mut colors = Vec::with_capacity(values.len());
-    let mut positions = Vec::with_capacity(values.len());
-
-    for value in values {
-        colors.push(r_colors::radar_color_for(value.value));
-        positions.push(reading_to_x(value));
-    }
-    skia_safe::gradient_shader::linear(
-        ((x_range.0, 0.0), (x_range.1, 0.0)),
-        &colors[..],
-        &positions[..],
-        skia_safe::TileMode::Clamp,
-        None,
-        None,
-    )
-    .unwrap()
-}
-
-fn interpolate_color(a: Color, b: Color, f: f32) -> Color {
-    Color::from_argb(
-        ((a.a() as f32 * (1.0 - f)) + b.a() as f32 * f) as u8,
-        ((a.r() as f32 * (1.0 - f)) + b.r() as f32 * f) as u8,
-        ((a.g() as f32 * (1.0 - f)) + b.g() as f32 * f) as u8,
-        ((a.b() as f32 * (1.0 - f)) + b.b() as f32 * f) as u8,
-    )
 }

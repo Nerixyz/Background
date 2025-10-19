@@ -6,7 +6,7 @@ use std::{
     sync::RwLock,
 };
 
-use crate::dwd::{Cache, Datapoint, PoiStation, WeatherCondition, get_etag};
+use crate::{Cache, Datapoint, PoiStation, WeatherCondition, get_etag};
 
 pub fn get(station: PoiStation, cache: &RwLock<Cache>) -> anyhow::Result<bool> {
     if !needs_fetch(station, MosmixType::L, &cache.read().unwrap())

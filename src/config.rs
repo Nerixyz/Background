@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use std::sync::LazyLock;
 
-use crate::dwd::PoiStation;
+use dwd_fetch::PoiStation;
 
 #[derive(Debug, Clone, serde::Deserialize)]
 struct ConfigData {
@@ -14,8 +14,9 @@ struct ConfigData {
 }
 
 pub struct Config {
-    data: ConfigData,
-    radar_coords: (usize, usize),
+    dwd: dwd_fetch::Config,
+    cache_file: String,
+    monitor_at_pos: (i32, i32),
 }
 
 pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {
@@ -32,27 +33,28 @@ pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {
 impl Config {
     fn new(data: ConfigData) -> Self {
         let radar_coords = latlong_to_idx(data.latitude, data.longitude);
-        Self { data, radar_coords }
-    }
-
-    pub fn radar_coords(&self) -> (usize, usize) {
-        self.radar_coords
-    }
-
-    pub fn poi_station(&self) -> PoiStation {
-        PoiStation(self.data.station)
+        let dwd = dwd_fetch::Config {
+            poi_station: PoiStation(data.station),
+            radar_coords,
+            synop_stations: data.synop_stations,
+        };
+        Self {
+            dwd,
+            monitor_at_pos: data.monitor_at_pos,
+            cache_file: data.cache_file,
+        }
     }
 
     pub fn cache_file(&self) -> &str {
-        &self.data.cache_file
+        &self.cache_file
     }
 
     pub fn monitor_at_pos(&self) -> (i32, i32) {
-        self.data.monitor_at_pos
+        self.monitor_at_pos
     }
 
-    pub fn synop_stations(&self) -> &[String] {
-        &self.data.synop_stations
+    pub fn dwd(&self) -> &dwd_fetch::Config {
+        &self.dwd
     }
 }
 

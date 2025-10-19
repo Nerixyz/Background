@@ -5,9 +5,7 @@ use std::{
     sync::RwLock,
 };
 
-use crate::dwd::{get_etag, needs_fetch};
-
-use super::{Cache, Datapoint, PoiStation, WeatherCondition};
+use super::{Cache, Datapoint, PoiStation, WeatherCondition, get_etag, needs_fetch};
 
 pub fn get(station: PoiStation, cache: &RwLock<Cache>) -> anyhow::Result<bool> {
     let url = format!("https://opendata.dwd.de/weather/weather_reports/poi/{station}-BEOB.csv");
