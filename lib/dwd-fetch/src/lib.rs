@@ -237,6 +237,19 @@ impl Cache {
     }
 }
 
+pub fn latlong_to_idx(lat: f64, long: f64) -> (usize, usize) {
+    let proj = proj4rs::Proj::from_user_string("+proj=stere +lat_0=90 +lat_ts=60 +lon_0=10 +a=6378137 +b=6356752.3142451802 +no_defs +x_0=543196.83521776402 +y_0=3622588.8619310018").unwrap();
+    let latlon = proj4rs::Proj::from_user_string("+proj=latlong").unwrap();
+    let mut p = (long.to_radians(), lat.to_radians());
+    proj4rs::transform::transform(&latlon, &proj, &mut p).unwrap();
+    let (x, y) = p;
+    // for some reason, y is negative
+    (
+        (x.round() / 1000.0) as usize,
+        (-(y.round() / 1000.0)) as usize,
+    )
+}
+
 fn get_etag(res: &ureq::http::Response<ureq::Body>) -> Option<String> {
     res.headers()
         .get("ETag")

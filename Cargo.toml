@@ -6,6 +6,7 @@ edition = "2024"
 [workspace]
 members = [
     ".",
+    "bin/min-dwd",
     "bin/picolini-srv",
     "lib/bufr-to-yaml",
     "lib/dwd-bufr-tables",
@@ -32,15 +33,27 @@ proj4rs = "0.1.8"
 quick-xml = "0.38.0"
 regex = "1.11.1"
 serde = { version = "1.0.219", features = ["derive"] }
+serde_json = { version = "1.0.145" }
 skia-util = { path = "lib/skia-util" }
 tar = "0.4.44"
 tinybufr = "0.1.2"
+toml = "0.4.9"
 ureq = { version = "3.0.12", features = [
     "gzip",
     "rustls",
 ], default-features = false }
 weather-layout = { path = "lib/weather-layout" }
 zip = { version = "5.0.0", default-features = false, features = ["deflate"] }
+icu_datetime = "2.0"
+icu_locale = "2.0"
+actix-web = "4.11"
+constant_time_eq = "0.4"
+base64 = "0.22"
+actix-web-error = "0.2"
+thiserror = "1.0"
+log = "0.4"
+env_logger = "0.11"
+arraydeque = "0.5.1"
 
 [dependencies]
 anyhow = { workspace = true }
@@ -70,7 +83,7 @@ skia-safe = { version = "0.89.0", features = [
 skia-util = { workspace = true }
 tar = { workspace = true }
 tinybufr = { workspace = true }
-toml = "0.9.4"
+toml = { workspace = true }
 ureq = { workspace = true }
 weather-layout = { workspace = true }
 windows = { version = "0.62.1", features = [

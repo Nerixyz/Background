@@ -23,3 +23,4 @@ tinybufr = { workspace = true }
 dwd-bufr-tables = { workspace = true }
 dwd-gts = { workspace = true }
 regex = { workspace = true }
+proj4rs = { workspace = true }

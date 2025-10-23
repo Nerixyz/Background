@@ -4,3 +4,23 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+weather-layout = { workspace = true }
+dwd-fetch = { workspace = true }
+skia-safe = { version = "0.89.0", features = ["textlayout"] }
+skia-util = { workspace = true }
+toml = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+proj4rs = { workspace = true }
+jiff = { workspace = true }
+icu_datetime = { workspace = true }
+icu_locale = { workspace = true }
+bincode = { workspace = true }
+actix-web = { workspace = true }
+constant_time_eq = { workspace = true }
+base64 = { workspace = true }
+anyhow = { workspace = true }
+actix-web-error = { workspace = true }
+thiserror = { workspace = true }
+env_logger = { workspace = true }
+arraydeque = { workspace = true }
