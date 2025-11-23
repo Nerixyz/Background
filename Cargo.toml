@@ -40,6 +40,7 @@ tinybufr = "0.1.2"
 toml = "0.4.9"
 ureq = { version = "3.0.12", features = [
     "gzip",
+    "json",
     "rustls",
 ], default-features = false }
 weather-layout = { path = "lib/weather-layout" }

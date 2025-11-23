@@ -5,11 +5,17 @@ use skia_util::RectExt;
 use dwd_fetch::{Datapoint, RadarReading};
 use skia_util::gradient::AutoGradientBuilder;
 
+pub mod data;
+pub mod fmt;
 mod gradients;
+pub mod lines;
 
 pub use gradients::{ColorMap, Colorful, Grayscale};
 
-use crate::gradients::{create_r_gradient, create_t_gradient};
+use crate::{
+    data::{YMapping, min_max_n_by},
+    gradients::{create_r_gradient, create_t_gradient},
+};
 
 struct GraphPoint<'a> {
     pub x_pos: f32,
@@ -186,66 +192,29 @@ pub fn create_temperature_path<M: ColorMap>(
     plan: &Plan,
 ) -> (Option<TemperaturePlan>, Vec<HorizontalLine>) {
     // first, determine the bounds
-    let mut minmax = None;
-    let mut n_points = 0;
-    for point in &plan.points {
-        let Some(val) = point.data.temperature else {
-            continue;
-        };
-        match minmax {
-            None => minmax = Some((val, val)),
-            Some((min, max)) => minmax = Some((min.min(val), max.max(val))),
-        }
-        n_points += 1;
-    }
-    let Some((mut min, mut max)) = minmax else {
+    let Some((min, max, n_points)) = min_max_n_by(&plan.points, |p| p.data.temperature) else {
         return (None, Vec::new());
     };
-    min = (min / 5.0).round() * 5.0 - 5.0;
-    max = (max / 5.0).round() * 5.0 + 5.0;
-    let range = max - min;
-    let height = plan.rect.height();
+    let min = (min / 5.0).round() * 5.0 - 5.0;
+    let max = (max / 5.0).round() * 5.0 + 5.0;
+    let mapping = YMapping::from_min_max(min, max, plan.rect);
 
     let mut points = Vec::with_capacity(n_points);
     for p in &plan.points {
         let Some(t) = p.data.temperature else {
             continue;
         };
-        let y_off = (t - min) * height / range;
-        points.push(Point::new(p.x_pos, plan.rect.bottom - y_off));
+        points.push(Point::new(p.x_pos, mapping.map(t)));
     }
 
-    let mut path = Path::new();
-    path.move_to(points[0]);
+    let path = lines::create_interpolated_path(&points);
 
-    let mut pending_point = points[0];
-    for it in points.windows(3) {
-        let prev = it[0];
-        let cur = it[1];
-        let next = it[2];
-
-        let x_dist = next.x - prev.x;
-        let handle_range = x_dist / 8.0;
-        let y_off = (next.y - prev.y) * handle_range / x_dist;
-        let grad = Point::new(handle_range, y_off);
-        path.cubic_to(pending_point, cur - grad, cur);
-        pending_point = cur + grad;
-    }
-
-    if points.len() >= 2 {
-        let cur = points[points.len() - 1];
-        path.cubic_to(pending_point, cur, cur);
-    }
-
-    let temp_to_y_scale = plan.rect.height() / (max - min).max(1.0);
-    let temp_to_y = |temp: f32| plan.rect.bottom + (min - temp) * temp_to_y_scale;
-
-    let shader = create_t_gradient::<M>(temp_to_y(M::MIN_T), temp_to_y(M::MAX_T));
+    let shader = create_t_gradient::<M>(mapping.map(M::MIN_T), mapping.map(M::MAX_T));
     let mut horizontal = Vec::new();
     {
         let mut t = min + 5.0;
         while t < max {
-            horizontal.push(HorizontalLine::from_temp(t, temp_to_y));
+            horizontal.push(HorizontalLine::new(mapping.map(t).round(), t));
             t += 5.0;
         }
     }
@@ -254,9 +223,9 @@ pub fn create_temperature_path<M: ColorMap>(
 }
 
 impl HorizontalLine {
-    pub fn from_temp(temperature: f32, temp_to_y: impl Fn(f32) -> f32) -> Self {
+    pub fn new(y_pos: f32, temperature: f32) -> Self {
         Self {
-            y_pos: temp_to_y(temperature).round(),
+            y_pos,
             temperature: temperature as i32,
             rain: None,
         }

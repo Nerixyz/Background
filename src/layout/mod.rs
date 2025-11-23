@@ -7,7 +7,9 @@ pub mod text;
 pub struct LayoutCtx {
     pub outer_main_rect: Rect,
     pub main_rect: Rect,
-    pub side_rect: Rect,
+    pub l_side_rect: Rect,
+    pub l_inner_rect: Rect,
+    pub r_side_rect: Rect,
     pub fonts: Fonts,
     pub image_size: Size,
 }
@@ -21,11 +23,16 @@ impl LayoutCtx {
         let outer_main_rect = centered_rect(
             (image_size.width / 2.0, image_size.height - 300.0),
             (750.0, 200.0),
-        )
-        .moved_by(Point::new(-100.0, 0.0));
+        );
 
         let main_rect = outer_main_rect.with_bottom_offset(-50.0);
-        let side_rect = Rect::from_xywh(
+        let l_side_rect = Rect::from_xywh(
+            outer_main_rect.left - 20.0 - 200.0,
+            outer_main_rect.y(),
+            200.0,
+            200.0,
+        );
+        let r_side_rect = Rect::from_xywh(
             outer_main_rect.right + 20.0,
             outer_main_rect.y(),
             200.0,
@@ -34,7 +41,9 @@ impl LayoutCtx {
         Self {
             outer_main_rect,
             main_rect,
-            side_rect,
+            r_side_rect,
+            l_side_rect,
+            l_inner_rect: l_side_rect.with_inset((20.0, 20.0)),
             fonts,
             image_size,
         }

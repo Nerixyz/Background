@@ -11,12 +11,16 @@ struct ConfigData {
     cache_file: String,
     monitor_at_pos: (i32, i32),
     synop_stations: Vec<String>,
+    picolini_url: String,
+    access_secret: String,
 }
 
 pub struct Config {
     dwd: dwd_fetch::Config,
     cache_file: String,
     monitor_at_pos: (i32, i32),
+    picolini_url: String,
+    access_secret: String,
 }
 
 pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {
@@ -42,6 +46,8 @@ impl Config {
             dwd,
             monitor_at_pos: data.monitor_at_pos,
             cache_file: data.cache_file,
+            picolini_url: data.picolini_url,
+            access_secret: data.access_secret,
         }
     }
 
@@ -55,6 +61,14 @@ impl Config {
 
     pub fn dwd(&self) -> &dwd_fetch::Config {
         &self.dwd
+    }
+
+    pub fn access_secret(&self) -> &str {
+        &self.access_secret
+    }
+
+    pub fn picolini_url(&self) -> &str {
+        &self.picolini_url
     }
 }
 

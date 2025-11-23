@@ -17,6 +17,7 @@ use crate::{
         BlurredSquircleItem, CurrentTime, ImageItem, LineItem, LinesItem, PaintLineItem, PathItem,
         Pipeline, RestoreOp, RrectItem, ShaderClipOp, TextItem, TextsItem,
     },
+    picolini::{self, PicoliniCache, PicoliniPlan},
 };
 use dwd_fetch::{Cache, Datapoint, icons::Msn};
 use weather_layout::{
@@ -26,6 +27,7 @@ use weather_layout::{
 
 pub struct Context {
     pub cache: Arc<RwLock<Cache>>,
+    pub picolini: Arc<RwLock<PicoliniCache>>,
     pub plans: Option<Plans>,
     pub icons: IconRenderer<Msn>,
     pub bg_image: Image,
@@ -41,10 +43,11 @@ pub struct Plans {
     pub horizontal_lines: Vec<HorizontalLine>,
     pub current: Option<Datapoint>,
     pub radar: Option<RadarPlan>,
+    pub picolini: Option<PicoliniPlan>,
 }
 
 impl Plans {
-    pub fn new(cache: &Cache, ctx: &LayoutCtx) -> Self {
+    pub fn new(cache: &Cache, picolini: &PicoliniCache, ctx: &LayoutCtx) -> Self {
         let merged = Datapoint::merge_series_ref(&cache.report, &cache.forecast);
         let (overall, sections) = weather_layout::plan_in(ctx.main_rect, &merged);
         let (temperature, mut horizontal_lines) =
@@ -54,11 +57,12 @@ impl Plans {
         let current = cache
             .observation
             .clone()
-            .or_else(|| merged.iter().filter(|x| x.is_report).next_back().cloned());
+            .or_else(|| merged.iter().rfind(|x| x.is_report).cloned());
         let radar = weather_layout::create_radar_plan::<Colorful>(
-            ctx.side_rect.with_inset((20.0, 0.0)),
+            ctx.r_side_rect.with_inset((20.0, 0.0)),
             &cache.radar,
         );
+        let picolini = picolini.plan(ctx.l_inner_rect);
 
         Self {
             sections,
@@ -68,6 +72,7 @@ impl Plans {
             horizontal_lines,
             current,
             radar,
+            picolini,
         }
     }
 }
@@ -78,6 +83,7 @@ impl Context {
             LayoutCtx::new(Size::new(bg_image.width() as f32, bg_image.height() as f32));
         Self {
             cache: Arc::new(RwLock::new(cache)),
+            picolini: Arc::new(RwLock::new(PicoliniCache::new())),
             plans: None,
             icons: IconRenderer::new(),
             bg_image,
@@ -86,7 +92,10 @@ impl Context {
     }
 
     pub fn update(&mut self) -> bool {
-        if Cache::refetch(&self.cache, CONFIG.dwd()).unwrap() {
+        let pico_hdl = PicoliniCache::start_refresh();
+        let cache_res = Cache::refetch(&self.cache, CONFIG.dwd()).unwrap();
+        let pico_res = self.picolini.write().unwrap().collect_refresh(pico_hdl);
+        if pico_res || cache_res {
             self.replan();
             true
         } else {
@@ -97,7 +106,11 @@ impl Context {
     pub fn replan(&mut self) {
         let cache = self.cache.read().unwrap();
         cache.to_file(CONFIG.cache_file()).unwrap();
-        self.plans = Some(Plans::new(&cache, &self.layout_ctx));
+        self.plans = Some(Plans::new(
+            &cache,
+            &self.picolini.read().unwrap(),
+            &self.layout_ctx,
+        ));
     }
 
     pub fn relayout(&mut self, pipl: &mut Pipeline) {
@@ -108,10 +121,11 @@ impl Context {
         });
 
         self.main_pipeline(pipl);
-        self.side_pipl(pipl);
+        self.r_side_pipl(pipl);
+        self.l_side_pipl(pipl);
     }
 
-    pub fn main_pipeline(&mut self, pipl: &mut Pipeline) {
+    fn main_pipeline(&mut self, pipl: &mut Pipeline) {
         let Some(ref plans) = self.plans else {
             return;
         };
@@ -255,12 +269,12 @@ impl Context {
         pipl.add(RestoreOp {}); // squircle clip
     }
 
-    pub fn side_pipl(&mut self, pipl: &mut Pipeline) {
+    fn r_side_pipl(&mut self, pipl: &mut Pipeline) {
         let Some(current) = self.plans.as_ref().and_then(|p| p.current.as_ref()) else {
             return;
         };
         pipl.add(BlurredSquircleItem::new(
-            self.layout_ctx.side_rect,
+            self.layout_ctx.r_side_rect,
             25.0,
             30.0,
             1.0,
@@ -270,7 +284,7 @@ impl Context {
             let (blob, pos) = align_text(
                 &format!("{temp:.*}°", if temp.fract() == 0.0 { 0 } else { 1 }),
                 &self.layout_ctx.fonts.large,
-                self.layout_ctx.side_rect.top_right() + Point::new(-20.0, 20.0),
+                self.layout_ctx.r_side_rect.top_right() + Point::new(-20.0, 20.0),
                 Align::TopRight,
             );
             pipl.add(TextItem {
@@ -282,8 +296,8 @@ impl Context {
         if let Some(svg) = self.icons.layout(
             current,
             Rect::from_xywh(
-                self.layout_ctx.side_rect.left + 20.0,
-                self.layout_ctx.side_rect.top + 20.0,
+                self.layout_ctx.r_side_rect.left + 20.0,
+                self.layout_ctx.r_side_rect.top + 20.0,
                 40.0,
                 40.0,
             ),
@@ -291,14 +305,14 @@ impl Context {
             pipl.add(svg);
         }
 
-        let mut y = self.layout_ctx.side_rect.top + 60.0;
+        let mut y = self.layout_ctx.r_side_rect.top + 60.0;
 
         let mut texts = Vec::new();
         let label = |texts: &mut Vec<(TextBlob, Point)>, text: &str, y: f32| {
             texts.push(align_text(
                 text,
                 &self.layout_ctx.fonts.medium_light,
-                (self.layout_ctx.side_rect.left + 20.0, y),
+                (self.layout_ctx.r_side_rect.left + 20.0, y),
                 Align::BottomLeft,
             ));
         };
@@ -306,7 +320,7 @@ impl Context {
             texts.push(align_text(
                 text,
                 &self.layout_ctx.fonts.medium,
-                (self.layout_ctx.side_rect.right - 20.0, y),
+                (self.layout_ctx.r_side_rect.right - 20.0, y),
                 Align::BottomRight,
             ));
         };
@@ -335,10 +349,10 @@ impl Context {
             const BOTTOM_OFF: f32 = 20.0;
             const HEIGHT: f32 = 10.0;
             let base_rect = Rect::from_ltrb(
-                self.layout_ctx.side_rect.left + 20.0,
-                self.layout_ctx.side_rect.bottom - BOTTOM_OFF - HEIGHT,
-                self.layout_ctx.side_rect.right - 20.0,
-                self.layout_ctx.side_rect.bottom - BOTTOM_OFF,
+                self.layout_ctx.r_side_rect.left + 20.0,
+                self.layout_ctx.r_side_rect.bottom - BOTTOM_OFF - HEIGHT,
+                self.layout_ctx.r_side_rect.right - 20.0,
+                self.layout_ctx.r_side_rect.bottom - BOTTOM_OFF,
             );
             let rrect = RRect::new_rect_xy(base_rect, 5.0, 5.0);
             pipl.add(RrectItem {
@@ -381,6 +395,56 @@ impl Context {
         pipl.add(TextsItem {
             texts,
             color: Color::WHITE,
+        });
+
+        pipl.add(RestoreOp {}); // squircle clip
+    }
+
+    fn l_side_pipl(&mut self, pipl: &mut Pipeline) {
+        let Some(pico) = self.plans.as_ref().and_then(|p| p.picolini.as_ref()) else {
+            return;
+        };
+        pipl.add(BlurredSquircleItem::new(
+            self.layout_ctx.l_side_rect,
+            25.0,
+            30.0,
+            1.0,
+        ));
+
+        let mut texts = Vec::new();
+
+        let mut add_item = |it: &picolini::PlanItem| {
+            let mut paint = Paint::default();
+            paint.set_anti_alias(true);
+            paint.set_shader(it.shader.clone());
+            paint.set_stroke_width(1.5);
+            paint.set_color(Color::WHITE);
+            paint.set_style(skia_safe::PaintStyle::Stroke);
+            pipl.add(PathItem {
+                path: it.path.clone(),
+                paint,
+            });
+            texts.push(align_text(
+                &it.text,
+                &self.layout_ctx.fonts.medium,
+                it.text_point,
+                Align::Right,
+            ));
+        };
+        add_item(&pico.temperature);
+        add_item(&pico.iaq);
+        add_item(&pico.co2);
+
+        texts.push(align_text(
+            &pico.top_label,
+            &self.layout_ctx.fonts.small,
+            self.layout_ctx.l_inner_rect.bottom_center() + Point::new(0.0, 5.0),
+            Align::TopCenter,
+        ));
+
+        pipl.add(TextsItem {
+            color: Color::WHITE,
+            texts,
         });
 
         pipl.add(RestoreOp {}); // squircle clip

@@ -18,6 +18,7 @@ mod extensions;
 mod icons;
 mod layout;
 mod paint;
+mod picolini;
 mod platform;
 mod squircle;
 mod window;

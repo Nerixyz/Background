@@ -11,7 +11,10 @@ use winit::{
     window::WindowId,
 };
 
-use crate::{config::CONFIG, context::Context, paint::Pipeline, platform, window::DxWindow};
+use crate::{
+    config::CONFIG, context::Context, paint::Pipeline, picolini::PicoliniCache, platform,
+    window::DxWindow,
+};
 
 pub enum AppEvent {
     Refresh,
@@ -122,13 +125,17 @@ impl Application {
         let event_loop = EventLoop::<AppEvent>::with_user_event().build().unwrap();
         let proxy = event_loop.create_proxy();
         let cache = self.context.cache.clone();
+        let pico = self.context.picolini.clone();
 
         // every so often we need to repaint the current time
         let mut pending_ticks = REPAINT_TICKS;
         std::thread::spawn(move || {
             loop {
                 std::thread::sleep(Duration::from_secs(30));
-                if Cache::refetch(&cache, CONFIG.dwd()).unwrap_or_default() {
+                let pico_hdl = PicoliniCache::start_refresh();
+                let cache_res = Cache::refetch(&cache, CONFIG.dwd()).unwrap_or_default();
+                let pico_res = pico.write().unwrap().collect_refresh(pico_hdl);
+                if pico_res || cache_res {
                     let _ = proxy.send_event(AppEvent::Refresh);
                     pending_ticks = REPAINT_TICKS;
                 }
