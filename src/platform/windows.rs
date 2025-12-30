@@ -57,9 +57,6 @@ pub fn setup_for_hwnd(hwnd: HWND) -> anyhow::Result<()> {
 
         SetParent(hwnd, Some(workerw))?;
 
-        let mut parent_rect = RECT::default();
-        GetWindowRect(workerw, &raw mut parent_rect)?;
-
         let my_scale = GetDpiForWindow(hwnd);
         if my_scale == 0 {
             bail!("invalid scale");
