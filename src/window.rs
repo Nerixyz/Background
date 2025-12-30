@@ -27,7 +27,7 @@ use windows::{
     core::Interface,
 };
 use winit::{
-    dpi::LogicalSize,
+    dpi::PhysicalSize,
     event_loop::ActiveEventLoop,
     platform::windows::WindowAttributesExtWindows,
     window::{Window, WindowAttributes},
@@ -56,7 +56,7 @@ impl DxWindow {
     ) -> anyhow::Result<Self> {
         let mut window_attributes = WindowAttributes::default().with_class_name("x-dx-window");
         window_attributes.decorations = false;
-        window_attributes.inner_size = Some(winit::dpi::Size::new(LogicalSize::new(
+        window_attributes.inner_size = Some(winit::dpi::Size::new(PhysicalSize::new(
             initial_size.width,
             initial_size.height,
         )));
