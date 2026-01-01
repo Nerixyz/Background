@@ -42,7 +42,7 @@ impl Paintable for BlurredSquircleItem {
 impl BlurredSquircleItem {
     pub fn new(rect: impl Into<Rect>, blur_radius: f32, radius: f32, smoothing: f32) -> Self {
         let rect = rect.into();
-        let path = crate::squircle::create_path(rect, radius, smoothing);
+        let path = skia_util::squircle::create_path(rect, radius, smoothing);
 
         let filter =
             image_filters::blur((blur_radius, blur_radius), TileMode::Clamp, None, None).unwrap();

@@ -34,6 +34,7 @@ quick-xml = "0.38.0"
 regex = "1.11.1"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = { version = "1.0.145" }
+skia-safe = { version = "0.91.1" }
 skia-util = { path = "lib/skia-util" }
 tar = "0.4.44"
 tinybufr = "0.1.2"
@@ -75,7 +76,7 @@ proj4rs = { workspace = true }
 quick-xml = { workspace = true }
 regex = { workspace = true }
 serde = { workspace = true }
-skia-safe = { version = "0.89.0", features = [
+skia-safe = { workspace = true, features = [
     "d3d",
     "windows",
     "textlayout",

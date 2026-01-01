@@ -1,5 +1,5 @@
 use jiff::ToSpan;
-use skia_safe::{Color, Path, Point, Rect, Shader};
+use skia_safe::{Color, Path, PathBuilder, Point, Rect, Shader};
 use skia_util::RectExt;
 
 use dwd_fetch::{Datapoint, RadarReading};
@@ -261,7 +261,7 @@ pub fn create_rain_plan<M: ColorMap>(
     let area_height = plan.rect.height();
 
     let mut pending_point = Point::new(plan.rect.left, plan.rect.bottom);
-    let mut path = Path::new();
+    let mut path = PathBuilder::new();
     let mut gradient =
         AutoGradientBuilder::new_horizontal((plan.rect.top_left(), plan.rect.top_right()));
     path.move_to(pending_point);
@@ -283,7 +283,10 @@ pub fn create_rain_plan<M: ColorMap>(
     path.close();
     let gradient = gradient.build();
 
-    Some(RainPlan { path, gradient })
+    Some(RainPlan {
+        path: path.detach(),
+        gradient,
+    })
 }
 
 // % chance for precipitation

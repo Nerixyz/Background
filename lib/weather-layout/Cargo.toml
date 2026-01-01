@@ -5,6 +5,6 @@ edition = "2024"
 
 [dependencies]
 dwd-fetch = { workspace = true }
-skia-safe = { version = "0.89.0", features = ["textlayout"] }
+skia-safe = { workspace = true, features = ["textlayout"] }
 skia-util = { workspace = true }
 jiff = { workspace = true }

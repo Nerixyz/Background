@@ -1,7 +1,7 @@
-use skia_safe::{Path, Point};
+use skia_safe::{Path, PathBuilder, Point};
 
 pub fn create_interpolated_path(points: &[Point]) -> Path {
-    let mut path = Path::new();
+    let mut path = PathBuilder::new();
     path.move_to(points[0]);
 
     let mut pending_point = points[0];
@@ -22,5 +22,5 @@ pub fn create_interpolated_path(points: &[Point]) -> Path {
         let cur = points[points.len() - 1];
         path.cubic_to(pending_point, cur, cur);
     }
-    path
+    path.detach()
 }

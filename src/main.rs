@@ -20,7 +20,6 @@ mod layout;
 mod paint;
 mod picolini;
 mod platform;
-mod squircle;
 mod window;
 
 #[derive(clap::Parser)]
