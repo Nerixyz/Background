@@ -1,4 +1,4 @@
-use skia_safe::{Path, PathDirection, Rect, Size, path::ArcSize};
+use skia_safe::{Path, PathBuilder, PathDirection, Rect, Size, path_builder::ArcSize};
 
 #[derive(Debug)]
 struct CornerParams {
@@ -52,7 +52,7 @@ pub fn create_path(rect: impl Into<Rect>, radius: f32, smoothing: f32) -> Path {
     let rect = rect.into();
     let size = rect.size();
 
-    let mut path = Path::new();
+    let mut path = PathBuilder::new();
     let CornerParams {
         a,
         b,
@@ -72,7 +72,7 @@ pub fn create_path(rect: impl Into<Rect>, radius: f32, smoothing: f32) -> Path {
         (x + width - (p - a - b), y),
         (x + width - (p - a - b - c), y + d),
     );
-    path.r_arc_to_rotated(
+    path.r_arc_to(
         (radius, radius),
         0.0,
         ArcSize::Small,
@@ -92,7 +92,7 @@ pub fn create_path(rect: impl Into<Rect>, radius: f32, smoothing: f32) -> Path {
         (x + width, y + height - (p - a - b)),
         (x + width - d, y + height - (p - a - b - c)),
     );
-    path.r_arc_to_rotated(
+    path.r_arc_to(
         (radius, radius),
         0.0,
         ArcSize::Small,
@@ -112,7 +112,7 @@ pub fn create_path(rect: impl Into<Rect>, radius: f32, smoothing: f32) -> Path {
         (x + p - a - b, y + height),
         (x + p - a - b - c, y + height - d),
     );
-    path.r_arc_to_rotated(
+    path.r_arc_to(
         (radius, radius),
         0.0,
         ArcSize::Small,
@@ -132,7 +132,7 @@ pub fn create_path(rect: impl Into<Rect>, radius: f32, smoothing: f32) -> Path {
         (x, y + p - a - b),
         (x + d, y + p - a - b - c),
     );
-    path.r_arc_to_rotated(
+    path.r_arc_to(
         (radius, radius),
         0.0,
         ArcSize::Small,
@@ -146,5 +146,5 @@ pub fn create_path(rect: impl Into<Rect>, radius: f32, smoothing: f32) -> Path {
     );
     path.close();
 
-    path
+    path.detach()
 }
