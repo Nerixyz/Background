@@ -3,6 +3,7 @@
 use anyhow::anyhow;
 use clap::Parser;
 use skia_safe::{Data, EncodedImageFormat, Image, surfaces};
+use std::fmt::Write;
 use std::fs;
 use std::path::PathBuf;
 
@@ -58,6 +59,20 @@ fn cd_to_exe() {
 }
 
 fn main() -> anyhow::Result<()> {
+    std::panic::set_hook(Box::new(|info| {
+        let mut buf = String::from("Panic occurred: ");
+
+        if let Some(msg) = info.payload_as_str() {
+            buf.push_str(msg);
+        } else {
+            buf.push_str("(no message)");
+        }
+        if let Some(loc) = info.location() {
+            let _ = write!(&mut buf, " at {loc}");
+        }
+        let _ = win_msgbox::error::<win_msgbox::Okay>(&buf).show();
+    }));
+
     let args = Args::parse();
     if let Some(Command::Autostart { command }) = &args.command {
         match command {
