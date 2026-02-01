@@ -100,6 +100,7 @@ impl ApplicationHandler<AppEvent> for Application {
                 window.render(&mut self.pipl, &self.context.layout_ctx);
             }
             AppEvent::Repaint => {
+                self.context.relayout(&mut self.pipl);
                 window.render(&mut self.pipl, &self.context.layout_ctx);
             }
         }
@@ -135,6 +136,9 @@ impl Application {
                 let pico_hdl = PicoliniCache::start_refresh();
                 let cache_res = Cache::refetch(&cache, CONFIG.dwd()).unwrap_or_default();
                 let pico_res = pico.write().unwrap().collect_refresh(pico_hdl);
+                if cache_res {
+                    tracing::info!("DWD updated");
+                }
                 if pico_res || cache_res {
                     let _ = proxy.send_event(AppEvent::Refresh);
                     pending_ticks = REPAINT_TICKS;
@@ -147,6 +151,9 @@ impl Application {
                 }
             }
         });
-        event_loop.run_app(self).expect("Failed to run event loop");
+        event_loop
+            .run_app(self)
+            .inspect_err(|e| tracing::error!("Event loop failed: {e}"))
+            .expect("Failed to run event loop");
     }
 }
