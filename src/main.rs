@@ -18,6 +18,7 @@ mod context;
 mod extensions;
 mod icons;
 mod layout;
+mod logging;
 mod paint;
 mod picolini;
 mod platform;
@@ -60,6 +61,7 @@ fn cd_to_exe() {
 
 fn main() -> anyhow::Result<()> {
     std::panic::set_hook(Box::new(|info| {
+        tracing::error!("Panic occurred: {}", info);
         let mut buf = String::from("Panic occurred: ");
 
         if let Some(msg) = info.payload_as_str() {
@@ -70,7 +72,9 @@ fn main() -> anyhow::Result<()> {
         if let Some(loc) = info.location() {
             let _ = write!(&mut buf, " at {loc}");
         }
-        let _ = win_msgbox::error::<win_msgbox::Okay>(&buf).show();
+        let _ = win_msgbox::error::<win_msgbox::Okay>(&buf)
+            .show()
+            .inspect_err(|e| tracing::error!("Failed to show box: {e:#x}"));
     }));
 
     let args = Args::parse();
@@ -83,6 +87,9 @@ fn main() -> anyhow::Result<()> {
     }
 
     cd_to_exe();
+
+    let _guard = logging::init();
+    tracing::info!("Started.");
 
     let bg_img = Image::from_encoded(
         Data::from_filename("bg.png").ok_or_else(|| anyhow!("Failed to read bg.png"))?,

@@ -86,6 +86,9 @@ skia-util = { workspace = true }
 tar = { workspace = true }
 tinybufr = { workspace = true }
 toml = { workspace = true }
+tracing = "0.1.44"
+tracing-appender = "0.2.4"
+tracing-subscriber = { version = "0.3.22", features = ["fmt", "env-filter"] }
 ureq = { workspace = true }
 weather-layout = { workspace = true }
 win-msgbox = "0.2.2"
@@ -108,4 +111,5 @@ zip = { workspace = true }
 
 [profile.release]
 codegen-units = 1
+debug = "none"
 lto = "fat"
