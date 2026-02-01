@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-tinybufr = "0.1.2"
+tinybufr = "0.1.3"
