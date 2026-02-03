@@ -1,6 +1,7 @@
 use std::{
     path::PathBuf,
     sync::{Arc, LazyLock, RwLock},
+    time::Duration,
 };
 
 use anyhow::anyhow;
@@ -250,6 +251,14 @@ pub fn latlong_to_idx(lat: f64, long: f64) -> (usize, usize) {
     )
 }
 
+pub(crate) static AGENT: LazyLock<ureq::Agent> = LazyLock::new(|| {
+    ureq::Agent::new_with_config(
+        ureq::config::Config::builder()
+            .timeout_global(Some(Duration::from_secs(30)))
+            .build(),
+    )
+});
+
 fn get_etag(res: &ureq::http::Response<ureq::Body>) -> Option<String> {
     res.headers()
         .get("ETag")
@@ -266,7 +275,7 @@ where
         return true;
     }
 
-    let Ok(res) = ureq::head(url).call() else {
+    let Ok(res) = AGENT.head(url).call() else {
         return true;
     };
     if !res.status().is_success() {

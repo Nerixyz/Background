@@ -1,4 +1,4 @@
-use std::thread::JoinHandle;
+use std::{sync::LazyLock, thread::JoinHandle, time::Duration};
 
 use skia_safe::{Color, Path, Point, Rect, Shader, scalar};
 use skia_util::{RectExt, gridify};
@@ -49,6 +49,14 @@ pub struct RefreshHandle {
     hdl: JoinHandle<Vec<DataItem>>,
 }
 
+static AGENT: LazyLock<ureq::Agent> = LazyLock::new(|| {
+    ureq::Agent::new_with_config(
+        ureq::config::Config::builder()
+            .timeout_global(Some(Duration::from_secs(15)))
+            .build(),
+    )
+});
+
 impl PicoliniCache {
     pub fn new() -> Self {
         Self { items: Vec::new() }
@@ -77,7 +85,8 @@ impl PicoliniCache {
 }
 
 fn get() -> Vec<DataItem> {
-    let Ok(mut res) = ureq::get(CONFIG.picolini_url())
+    let Ok(mut res) = AGENT
+        .get(CONFIG.picolini_url())
         .header(
             "Authorization",
             format!("Bearer {}", CONFIG.access_secret()),

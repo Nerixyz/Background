@@ -10,7 +10,7 @@ use dwd_gts::GtsHeader;
 use regex::Regex;
 use tinybufr::{DataEvent, DataReader, DataSpec, HeaderSections, Tables, Value, XY};
 
-use crate::{Cache, Datapoint, WeatherCondition, get_etag, needs_fetch};
+use crate::{AGENT, Cache, Datapoint, WeatherCondition, get_etag, needs_fetch};
 
 const URL: &str = "https://opendata.dwd.de/weather/weather_reports/synoptic/germany/Z__C_EDZW_latest_bda01%2Csynop_bufr_GER_999999_999999__MW_XXX.bin";
 const LISTING_URL: &str = "https://opendata.dwd.de/weather/weather_reports/synoptic/germany";
@@ -23,7 +23,7 @@ pub fn get(cache: &RwLock<Cache>, stations: &[String]) -> anyhow::Result<bool> {
         return Ok(false);
     }
 
-    let mut res = ureq::get(URL).call()?;
+    let mut res = AGENT.get(URL).call()?;
     if !res.status().is_success() {
         bail!("Failed to get synop BUFR - got status {:?}", res.status());
     }
@@ -61,7 +61,7 @@ fn last_observation_is_old(cache: &RwLock<Cache>) -> bool {
 }
 
 fn try_old_reports(stations: &[String]) -> Option<Datapoint> {
-    let mut res = ureq::get(LISTING_URL).call().ok()?;
+    let mut res = AGENT.get(LISTING_URL).call().ok()?;
     if !res.status().is_success() {
         return None;
     }
@@ -72,7 +72,8 @@ fn try_old_reports(stations: &[String]) -> Option<Datapoint> {
             .and_then(|c| c.get(1).map(|m| m.as_str()))
     }) {
         let url = format!("{LISTING_URL}/{file}");
-        let Ok(mut res) = ureq::get(url)
+        let Ok(mut res) = AGENT
+            .get(url)
             .call()
             .inspect_err(|e| eprintln!("Failed to fetch old report: {e}"))
         else {

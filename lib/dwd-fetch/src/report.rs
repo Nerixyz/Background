@@ -5,6 +5,8 @@ use std::{
     sync::RwLock,
 };
 
+use crate::AGENT;
+
 use super::{Cache, Datapoint, PoiStation, WeatherCondition, get_etag, needs_fetch};
 
 pub fn get(station: PoiStation, cache: &RwLock<Cache>) -> anyhow::Result<bool> {
@@ -13,7 +15,7 @@ pub fn get(station: PoiStation, cache: &RwLock<Cache>) -> anyhow::Result<bool> {
         return Ok(false);
     }
 
-    let mut res = ureq::get(url).call()?;
+    let mut res = AGENT.get(url).call()?;
     if !res.status().is_success() {
         bail!("Failed to get station - got status {:?}", res.status());
     }

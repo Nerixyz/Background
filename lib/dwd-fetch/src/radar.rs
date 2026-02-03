@@ -5,7 +5,7 @@ use std::{
 
 use anyhow::bail;
 
-use crate::{Cache, RadarReading, ZONE, get_etag, needs_fetch};
+use crate::{AGENT, Cache, RadarReading, ZONE, get_etag, needs_fetch};
 
 const STATIC_HEADER_LEN: usize = 91;
 const DATE_0_OFFSET: usize = 2;
@@ -21,7 +21,7 @@ pub fn get(cache: &RwLock<Cache>, target: (usize, usize)) -> anyhow::Result<bool
         return Ok(false);
     }
 
-    let mut res = ureq::get(URL).call()?;
+    let mut res = AGENT.get(URL).call()?;
     if !res.status().is_success() {
         bail!("Failed to get radar - got status {:?}", res.status());
     }

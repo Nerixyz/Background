@@ -6,7 +6,7 @@ use std::{
     sync::RwLock,
 };
 
-use crate::{Cache, Datapoint, PoiStation, WeatherCondition, get_etag};
+use crate::{AGENT, Cache, Datapoint, PoiStation, WeatherCondition, get_etag};
 
 pub fn get(station: PoiStation, cache: &RwLock<Cache>) -> anyhow::Result<bool> {
     if !needs_fetch(station, MosmixType::L, &cache.read().unwrap())
@@ -45,7 +45,7 @@ pub fn get(station: PoiStation, cache: &RwLock<Cache>) -> anyhow::Result<bool> {
 }
 
 fn fetch(station: PoiStation, ty: MosmixType) -> anyhow::Result<(Vec<Datapoint>, Option<String>)> {
-    let mut res = ureq::get(ty.url(station)).call()?;
+    let mut res = AGENT.get(ty.url(station)).call()?;
     if !res.status().is_success() {
         bail!("Failed to get station - got status {:?}", res.status());
     }
