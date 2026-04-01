@@ -6,4 +6,4 @@ edition = "2024"
 [dependencies]
 anyhow = { workspace = true }
 atoi = { workspace = true }
-tinystr = "0.8.2"
+tinystr = "0.8.3"
