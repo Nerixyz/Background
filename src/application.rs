@@ -1,13 +1,21 @@
-use std::time::Duration;
+use std::{
+    cell::RefCell,
+    rc::Rc,
+    time::{Duration, Instant},
+};
 
 use dwd_fetch::Cache;
-use windows::Win32::Foundation::HWND;
+use windows::Win32::{
+    Foundation::HWND,
+    UI::WindowsAndMessaging::{MSG, RegisterWindowMessageW, WM_DISPLAYCHANGE},
+};
 use winit::{
     application::ApplicationHandler,
     dpi::PhysicalPosition,
     event::{ElementState, MouseButton, WindowEvent},
-    event_loop::{ActiveEventLoop, EventLoop},
+    event_loop::{ActiveEventLoop, EventLoop, EventLoopProxy},
     keyboard::PhysicalKey,
+    platform::windows::EventLoopBuilderExtWindows as _,
     window::WindowId,
 };
 
@@ -19,16 +27,20 @@ use crate::{
 pub enum AppEvent {
     Refresh,
     Repaint,
+    RedoMonitors,
 }
 
 pub struct Application {
     window: Option<DxWindow>,
+    hwnd: Option<HWND>,
     context: Context,
     pipl: Pipeline,
     clicked: bool,
     last_pos: PhysicalPosition<f64>,
     window_pos: Option<PhysicalPosition<i32>>,
     as_background: bool,
+
+    last_redo: Instant,
 }
 
 impl ApplicationHandler<AppEvent> for Application {
@@ -41,6 +53,7 @@ impl ApplicationHandler<AppEvent> for Application {
         )
         .expect("Failed to create window context");
         let hwnd = HWND(u64::from(window.window.id()) as *mut _);
+        self.hwnd = Some(hwnd);
         self.window = Some(window);
         if self.as_background {
             platform::windows::setup_for_hwnd(hwnd).unwrap();
@@ -59,10 +72,12 @@ impl ApplicationHandler<AppEvent> for Application {
             WindowEvent::RedrawRequested => {
                 window.render(&mut self.pipl, &self.context.layout_ctx);
             }
-            WindowEvent::MouseInput { state, button, .. } => {
-                if button == MouseButton::Left {
-                    self.clicked = state == ElementState::Pressed;
-                }
+            WindowEvent::MouseInput {
+                state,
+                button: MouseButton::Left,
+                ..
+            } => {
+                self.clicked = state == ElementState::Pressed;
             }
             WindowEvent::CursorMoved { position, .. } => {
                 if self.clicked {
@@ -103,6 +118,19 @@ impl ApplicationHandler<AppEvent> for Application {
                 self.context.relayout(&mut self.pipl);
                 window.render(&mut self.pipl, &self.context.layout_ctx);
             }
+            AppEvent::RedoMonitors => {
+                let now = Instant::now();
+                if now.duration_since(self.last_redo) < Duration::from_secs(1) {
+                    return;
+                }
+                self.last_redo = now;
+                if self.as_background
+                    && let Some(hwnd) = self.hwnd
+                    && let Err(e) = platform::windows::setup_for_hwnd(hwnd)
+                {
+                    tracing::error!("Failed to set up: {e}")
+                }
+            }
         }
     }
 }
@@ -111,20 +139,44 @@ impl Application {
     pub fn new(context: Context, pipl: Pipeline, as_background: bool) -> Self {
         Self {
             window: None,
+            hwnd: None,
             context,
             pipl,
             clicked: false,
             last_pos: PhysicalPosition::new(0.0, 0.0),
             window_pos: None,
             as_background,
+            last_redo: Instant::now(),
         }
     }
 
     pub fn run(&mut self) {
         const REPAINT_TICKS: u8 = 8; // -> every 4min
 
-        let event_loop = EventLoop::<AppEvent>::with_user_event().build().unwrap();
+        let mut builder = EventLoop::<AppEvent>::with_user_event();
+        let msg_proxy = Rc::new(RefCell::<Option<EventLoopProxy<AppEvent>>>::new(None));
+        let uxd_dcm =
+            unsafe { RegisterWindowMessageW(windows_strings::w!("UxdDisplayChangeMessage")) };
+        builder.with_msg_hook({
+            let proxy = msg_proxy.clone();
+            move |msg| {
+                let msg = msg as *const MSG;
+                unsafe {
+                    if ((*msg).message == WM_DISPLAYCHANGE || (*msg).message == uxd_dcm)
+                        && let Some(proxy) = &*proxy.borrow()
+                    {
+                        let _ = proxy.send_event(AppEvent::RedoMonitors);
+                        return true;
+                    }
+                }
+
+                false
+            }
+        });
+
+        let event_loop = builder.build().unwrap();
         let proxy = event_loop.create_proxy();
+        *msg_proxy.borrow_mut() = Some(proxy.clone());
         let cache = self.context.cache.clone();
         let pico = self.context.picolini.clone();
 
