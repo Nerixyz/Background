@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Chatterino/chatterino2/master/docs/plugin-info.schema.json",
+  "name": "My Background",
+  "description": "Control my background",
+  "authors": ["Nerixyz"],
+  "version": "0.0.0",
+  "license": "Beerware",
+  "permissions": [
+    {
+      "type": "Network"
+    }
+  ]
+}

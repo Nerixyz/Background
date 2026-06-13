@@ -20,8 +20,8 @@ use winit::{
 };
 
 use crate::{
-    config::CONFIG, context::Context, paint::Pipeline, picolini::PicoliniCache, platform,
-    window::DxWindow,
+    config::CONFIG, context::Context, notifications::NotifyHandle, paint::Pipeline,
+    picolini::PicoliniCache, platform, window::DxWindow,
 };
 
 pub enum AppEvent {
@@ -179,6 +179,8 @@ impl Application {
         *msg_proxy.borrow_mut() = Some(proxy.clone());
         let cache = self.context.cache.clone();
         let pico = self.context.picolini.clone();
+        let notifier = NotifyHandle::new();
+        crate::http_server::run_http(CONFIG.server_port(), notifier.weak());
 
         // every so often we need to repaint the current time
         let mut pending_ticks = REPAINT_TICKS;
@@ -201,6 +203,7 @@ impl Application {
                 } else {
                     pending_ticks -= 1;
                 }
+                notifier.tick(&cache.write().unwrap().radar);
             }
         });
         event_loop
