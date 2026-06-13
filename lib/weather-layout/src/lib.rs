@@ -1,5 +1,5 @@
 use jiff::ToSpan;
-use skia_safe::{Color, Path, PathBuilder, Point, Rect, Shader};
+use skia_safe::{Color4f, Path, PathBuilder, Point, Rect, Shader};
 use skia_util::RectExt;
 
 use dwd_fetch::{Datapoint, RadarReading};
@@ -313,7 +313,7 @@ pub fn create_p_precipitation_plan(plan: &Plan) -> Option<PPrecipitationPlan> {
         let value = cur.data.p_precipitation.unwrap_or_default();
         let width = (next.x_pos - cur.x_pos) / 2.0;
         let cur_point = Point::new(cur.x_pos + width, 0.0);
-        let color = Color::from_argb((value * 2.5) as u8, 255, 255, 255);
+        let color = Color4f::new(1.0, 1.0, 1.0, value / 100.0);
         gradient.put(color, cur_point.x);
     }
     let gradient = gradient.build();

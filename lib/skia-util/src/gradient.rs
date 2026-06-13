@@ -1,4 +1,8 @@
-use skia_safe::{Color, Point, Rect, Shader, TileMode, gradient_shader, scalar};
+use skia_safe::{
+    Color4f, Point, Rect, Shader, TileMode, colors,
+    gradient::{Colors, Gradient, Interpolation, shaders},
+    scalar,
+};
 
 use crate::extensions::RectExt;
 
@@ -17,7 +21,7 @@ pub fn mask_gradient_vert(outer: Rect) -> Shader {
 }
 
 pub struct GradientBuilder {
-    colors: Vec<Color>,
+    colors: Vec<Color4f>,
     positions: Vec<scalar>,
 }
 
@@ -29,18 +33,23 @@ impl GradientBuilder {
         }
     }
 
-    pub fn put(&mut self, color: Color, pos: scalar) {
+    pub fn put(&mut self, color: Color4f, pos: scalar) {
         self.colors.push(color);
         self.positions.push(pos);
     }
 
     pub fn build(&self, points: (impl Into<Point>, impl Into<Point>)) -> Shader {
-        gradient_shader::linear(
+        shaders::linear_gradient(
             points,
-            &self.colors[..],
-            &self.positions[..],
-            TileMode::Clamp,
-            None,
+            &Gradient::new(
+                Colors::new(
+                    &self.colors[..],
+                    Some(&self.positions[..]),
+                    TileMode::Clamp,
+                    None,
+                ),
+                Interpolation::default(),
+            ),
             None,
         )
         .unwrap()
@@ -76,7 +85,7 @@ impl AutoGradientBuilder {
         }
     }
 
-    pub fn put(&mut self, color: Color, x: f32) {
+    pub fn put(&mut self, color: Color4f, x: f32) {
         self.gb.put(color, (x - self.begin) / self.div);
     }
 
@@ -86,17 +95,22 @@ impl AutoGradientBuilder {
 }
 
 fn mask_gradient(points: (impl Into<Point>, impl Into<Point>), pos1: f32, pos2: f32) -> Shader {
-    gradient_shader::linear(
+    shaders::linear_gradient(
         points,
-        &[
-            Color::TRANSPARENT,
-            Color::WHITE,
-            Color::WHITE,
-            Color::TRANSPARENT,
-        ][..],
-        &[0.0, pos1, pos2, 1.0][..],
-        TileMode::Clamp,
-        None,
+        &Gradient::new(
+            Colors::new(
+                &[
+                    colors::TRANSPARENT,
+                    colors::WHITE,
+                    colors::WHITE,
+                    colors::TRANSPARENT,
+                ],
+                Some(&[0.0, pos1, pos2, 1.0]),
+                TileMode::Clamp,
+                None,
+            ),
+            Interpolation::default(),
+        ),
         None,
     )
     .unwrap()

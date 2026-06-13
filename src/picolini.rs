@@ -1,7 +1,11 @@
 use std::thread::JoinHandle;
 
-use skia_safe::{Color, Path, Point, Rect, Shader, scalar};
-use skia_util::{RectExt, gridify};
+use skia_safe::{
+    Color4f, Path, Point, Rect, Shader, TileMode,
+    gradient::{Colors, Gradient, Interpolation, shaders},
+    scalar,
+};
+use skia_util::{RectExt, color::rgb4f, gridify};
 use weather_layout::{
     ColorMap,
     data::{YMapping, min_max_n_by},
@@ -187,12 +191,12 @@ fn layout_graph<M: ColorMap>(
         .collect::<Vec<_>>();
     let path = create_interpolated_path(&points);
 
-    let shader = skia_safe::gradient_shader::linear(
+    let shader = shaders::linear_gradient(
         ((0.0, mapping.map(M::MIN_T)), (0.0, mapping.map(M::MAX_T))),
-        M::T_COLORS,
-        M::T_POS,
-        skia_safe::TileMode::Clamp,
-        None,
+        &Gradient::new(
+            Colors::new(M::T_COLORS, Some(M::T_POS), TileMode::Clamp, None),
+            Interpolation::default(),
+        ),
         None,
     )
     .unwrap();
@@ -202,12 +206,12 @@ fn layout_graph<M: ColorMap>(
 
 struct TempColors;
 impl ColorMap for TempColors {
-    const T_COLORS: &[Color] = &[
-        Color::from_rgb(18, 230, 230),
-        Color::from_rgb(85, 204, 0),
-        Color::from_rgb(255, 247, 0),
-        Color::from_rgb(255, 149, 0),
-        Color::from_rgb(247, 15, 15),
+    const T_COLORS: &[Color4f] = &[
+        rgb4f(18, 230, 230),
+        rgb4f(85, 204, 0),
+        rgb4f(255, 247, 0),
+        rgb4f(255, 149, 0),
+        rgb4f(247, 15, 15),
     ];
 
     const T_POS: &[scalar] = &[
@@ -222,8 +226,8 @@ impl ColorMap for TempColors {
 
     const MAX_T: f32 = 23.0;
 
-    fn map_rain(_value: f32) -> skia_safe::Color {
-        Color::new(0)
+    fn map_rain(_value: f32) -> Color4f {
+        Color4f::new(0., 0., 0., 0.)
     }
 }
 impl TempColors {
@@ -234,11 +238,7 @@ impl TempColors {
 
 struct IaqColors;
 impl ColorMap for IaqColors {
-    const T_COLORS: &[Color] = &[
-        Color::from_rgb(0, 255, 0),
-        Color::from_rgb(255, 255, 0),
-        Color::from_rgb(255, 0, 0),
-    ];
+    const T_COLORS: &[Color4f] = &[rgb4f(0, 255, 0), rgb4f(255, 255, 0), rgb4f(255, 0, 0)];
 
     const T_POS: &[scalar] = &[Self::pos_of(50.0), Self::pos_of(100.0), Self::pos_of(200.0)];
 
@@ -246,8 +246,8 @@ impl ColorMap for IaqColors {
 
     const MAX_T: f32 = 200.0;
 
-    fn map_rain(_value: f32) -> skia_safe::Color {
-        Color::new(0)
+    fn map_rain(_value: f32) -> Color4f {
+        Color4f::new(0., 0., 0., 0.)
     }
 }
 impl IaqColors {
@@ -258,11 +258,7 @@ impl IaqColors {
 
 struct Co2Colors;
 impl ColorMap for Co2Colors {
-    const T_COLORS: &[Color] = &[
-        Color::from_rgb(0, 255, 0),
-        Color::from_rgb(255, 255, 0),
-        Color::from_rgb(255, 0, 0),
-    ];
+    const T_COLORS: &[Color4f] = &[rgb4f(0, 255, 0), rgb4f(255, 255, 0), rgb4f(255, 0, 0)];
 
     const T_POS: &[scalar] = &[
         Self::pos_of(400.0),
@@ -274,8 +270,8 @@ impl ColorMap for Co2Colors {
 
     const MAX_T: f32 = 2000.0;
 
-    fn map_rain(_value: f32) -> skia_safe::Color {
-        Color::new(0)
+    fn map_rain(_value: f32) -> Color4f {
+        Color4f::new(0., 0., 0., 0.)
     }
 }
 impl Co2Colors {

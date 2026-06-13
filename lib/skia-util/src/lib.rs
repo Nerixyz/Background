@@ -1,3 +1,4 @@
+pub mod color;
 mod extensions;
 pub mod fonts;
 pub mod gradient;
