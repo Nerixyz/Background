@@ -3,6 +3,8 @@ use std::sync::LazyLock;
 
 use dwd_fetch::PoiStation;
 
+const DEFAULT_SERVER_PORT: u16 = 47549;
+
 #[derive(Debug, Clone, serde::Deserialize)]
 struct ConfigData {
     station: u16,
@@ -13,6 +15,7 @@ struct ConfigData {
     synop_stations: Vec<String>,
     picolini_url: String,
     access_secret: String,
+    server_port: Option<u16>,
 }
 
 pub struct Config {
@@ -21,6 +24,7 @@ pub struct Config {
     monitor_at_pos: (i32, i32),
     picolini_url: String,
     access_secret: String,
+    server_port: u16,
 }
 
 pub static CONFIG: LazyLock<Config> = LazyLock::new(|| {
@@ -48,6 +52,7 @@ impl Config {
             cache_file: data.cache_file,
             picolini_url: data.picolini_url,
             access_secret: data.access_secret,
+            server_port: data.server_port.unwrap_or(DEFAULT_SERVER_PORT),
         }
     }
 
@@ -69,6 +74,10 @@ impl Config {
 
     pub fn picolini_url(&self) -> &str {
         &self.picolini_url
+    }
+
+    pub fn server_port(&self) -> u16 {
+        self.server_port
     }
 }
 
