@@ -1,7 +1,7 @@
 use skia_safe::{
     ColorType, Surface,
     gpu::{
-        BackendRenderTarget, DirectContext, Protected, SurfaceOrigin,
+        self, BackendRenderTarget, DirectContext, Protected, SurfaceOrigin,
         d3d::{BackendContext, ID3D12Device, IDXGIAdapter1, TextureResourceInfo},
         surfaces,
     },
@@ -81,7 +81,8 @@ impl DxWindow {
             memory_allocator: None,
             protected_context: Protected::No,
         };
-        let mut direct_context = unsafe { DirectContext::new_d3d(&backend_context, None) }.unwrap();
+        let mut direct_context =
+            unsafe { gpu::direct_contexts::make_d3d(&backend_context, None) }.unwrap();
 
         let swap_chain: IDXGISwapChain3 = unsafe {
             factory.CreateSwapChainForHwnd(
@@ -109,7 +110,7 @@ impl DxWindow {
         let surfaces: [_; BUFFER_COUNT] = std::array::from_fn(|i| {
             let resource = unsafe { swap_chain.GetBuffer(i as u32).unwrap() };
 
-            let backend_render_target = BackendRenderTarget::new_d3d(
+            let backend_render_target = gpu::backend_render_targets::make_d3d(
                 window.inner_size().into(),
                 &TextureResourceInfo {
                     resource,
