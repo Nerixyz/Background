@@ -6,7 +6,7 @@ It uses the [DWD open-data server](https://opendata.dwd.de/) to get weather data
 
 # Images
 
-TBD (there's a lot to do)
+![](.github/res/example.webp)
 
 # Setup
 
