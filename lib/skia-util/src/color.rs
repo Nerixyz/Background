@@ -17,5 +17,5 @@ pub const fn rgba4f(r: u8, g: u8, b: u8, a: u8) -> Color4f {
 }
 
 pub const fn rgb4f(r: u8, g: u8, b: u8) -> Color4f {
-    rgba4f(r, g, b, 0)
+    rgba4f(r, g, b, 255)
 }
