@@ -113,10 +113,10 @@ fn find_workerw() -> windows::core::Result<HWND> {
             None,
         );
 
-        // let def_view = FindWindowExW(Some(progman), None, w!("SHELLDLL_DefView"), None)?;
-        let worker_w = FindWindowExW(Some(progman), None, w!("WorkerW"), None)?;
+        let def_view = FindWindowExW(Some(progman), None, w!("SHELLDLL_DefView"), None)?;
+        // let worker_w = FindWindowExW(Some(progman), None, w!("WorkerW"), None)?;
 
-        Ok(worker_w)
+        Ok(def_view)
         // WorkerW is somewhere else on pre-win11-24H2 but I don't use that version
     }
 }
